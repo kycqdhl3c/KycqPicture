@@ -1,3 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<item name="kpRecyclerView" type="id"/>
+	<item name="kpViewPager" type="id"/>
+	<item name="kpPictureView" type="id"/>
+	<item name="kpMenuPicker" type="id"/>
+	<item name="kpMenuDelete" type="id"/>
+	<item name="kpIVCamera" type="id"/>
+	<item name="kpIVChecked" type="id"/>
 </resources>

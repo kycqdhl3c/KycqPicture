@@ -1,8 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.kycq.library.picture">
 	
-	<application>
+	<!-- 写入外部存储 -->
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<!-- 读取外部存储 -->
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 	
+	<application>
+		<provider
+			android:name="android.support.v4.content.FileProvider"
+			android:authorities="${applicationId}.PictureProvider"
+			android:exported="false"
+			android:grantUriPermissions="true"
+			android:readPermission="android.permission.READ_EXTERNAL_STORAGE"
+			android:writePermission="android.permission.WRITE_EXTERNAL_STORAGE">
+			<meta-data
+				android:name="android.support.FILE_PROVIDER_PATHS"
+				android:resource="@xml/kp_picture_paths"/>
+		</provider>
+		
+		<activity android:name=".picker.PicturePickerActivity"/>
+		<activity android:name=".viewer.PictureViewerActivity"/>
 	</application>
 
 </manifest>

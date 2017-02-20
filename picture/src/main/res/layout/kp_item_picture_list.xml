@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:padding="2dp">
+	
+	<com.facebook.drawee.view.SimpleDraweeView
+		android:id="@id/kpPictureView"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"/>
+	
+	<ImageView
+		android:id="@id/kpIVChecked"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_gravity="center"
+		android:padding="10dp"
+		android:src="@drawable/kp_ic_picture_check"
+		android:visibility="invisible"/>
+
+</FrameLayout>

@@ -26,7 +26,9 @@ dependencies {
 	androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
 		exclude group: 'com.android.support', module: 'support-annotations'
 	})
+	
 	compile fileTree(include: ['*.jar'], dir: 'libs')
 	provided 'com.android.support:appcompat-v7:25.1.1'
+	provided 'com.android.support:recyclerview-v7:25.1.1'
 	provided 'com.facebook.fresco:fresco:1.1.0'
 }
