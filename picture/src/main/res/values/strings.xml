@@ -1,0 +1,7 @@
+<resources>
+	<string name="kp_pick">选择</string>
+	<string name="kp_delete">删除</string>
+	<string name="kp_select_picture">选择照片</string>
+	<string name="kp_format_select_picture">选择照片(%1$d/%2$d)</string>
+	<string name="kp_picture_error">图片信息错误,无法加载</string>
+</resources>
