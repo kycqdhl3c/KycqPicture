@@ -1,8 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView
+<RelativeLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@id/kpRecyclerView"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context="com.kycq.library.picture.picker.PicturePickerActivity"/>
+	android:background="@color/kpBackgroundColor"
+	tools:context="com.kycq.library.picture.picker.KPPicturePickerActivity">
+	
+	<android.support.v7.widget.RecyclerView
+		android:id="@id/kpRecyclerViewPicture"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_above="@id/kpActionbar"/>
+	
+	<FrameLayout
+		android:id="@id/kpAlbumLayer"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_above="@id/kpActionbar"
+		android:background="@color/kpLayerColor"
+		android:visibility="gone"/>
+	
+	<android.support.v7.widget.RecyclerView
+		android:id="@id/kpRecyclerViewAlbum"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_above="@id/kpActionbar"
+		android:layout_marginTop="150dp"
+		android:background="@android:color/white"
+		android:visibility="gone"/>
+	
+	<LinearLayout
+		android:id="@id/kpActionbar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:background="@color/kpActionBarColor"
+		android:gravity="center_vertical"
+		android:visibility="gone"
+		tools:visibility="visible">
+		
+		<LinearLayout
+			android:id="@id/kpAlbum"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:padding="12dp">
+			
+			<TextView
+				android:id="@id/kpAlbumName"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textColor="@android:color/white"
+				android:textSize="14sp"
+				tools:text="@string/kp_all_picture"/>
+			
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="bottom"
+				android:layout_marginLeft="3dp"
+				android:src="@drawable/kp_bg_album_indicator"
+				tools:ignore="RtlHardcoded"/>
+		</LinearLayout>
+		
+		<View
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_weight="1.0"
+			android:background="@android:color/transparent"
+			android:clickable="true"/>
+		
+		<TextView
+			android:id="@id/kpPreview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:padding="12dp"
+			android:textColor="@android:color/white"
+			android:textSize="14sp"
+			tools:text="@string/kp_preview"/>
+	</LinearLayout>
+</RelativeLayout>

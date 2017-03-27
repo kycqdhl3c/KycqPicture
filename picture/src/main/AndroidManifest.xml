@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.kycq.library.picture">
 	
@@ -19,8 +20,8 @@
 				android:resource="@xml/kp_picture_paths"/>
 		</provider>
 		
-		<activity android:name=".picker.PicturePickerActivity"/>
-		<activity android:name=".viewer.PictureViewerActivity"/>
+		<activity android:name=".picker.KPPicturePickerActivity">
+		</activity>
 	</application>
 
 </manifest>

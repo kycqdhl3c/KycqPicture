@@ -12,97 +12,82 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-class ScaleTask extends AsyncTask<PictureInfo, Void, ArrayList<Uri>> {
-	/** 输出图片最大宽度 */
-	private int mMaxWidth;
-	/** 输出图片最大高度 */
-	private int mMaxHeight;
-
-	/** 图片缩放监听 */
-	private OnScaleListener mOnScaleListener;
-
-	/**
-	 * 构造方法
-	 *
-	 * @param maxWidth  输出图片最大宽度
-	 * @param maxHeight 输出图片最大高度
-	 * @param listener  图片缩放监听
-	 */
-	ScaleTask(int maxWidth, int maxHeight, OnScaleListener listener) {
-		mMaxWidth = maxWidth;
-		mMaxHeight = maxHeight;
-		mOnScaleListener = listener;
+public class ScaleTask extends AsyncTask<PictureInfo, Void, ArrayList<Uri>> {
+	/** png图片属性 */
+	private final static String IMAGE_PNG = "image/png";
+	
+	private KPPicker kpPicker;
+	private OnScaleListener onScaleListener;
+	
+	public ScaleTask(KPPicker kpPicker, OnScaleListener onScaleListener) {
+		this.kpPicker = kpPicker;
+		this.onScaleListener = onScaleListener;
 	}
-
+	
 	/**
 	 * 执行缩放图片任务
 	 *
-	 * @param pictureInfoArray 图片信息数组
+	 * @param pictureInfoList 图片信息列表
 	 */
-	void executeScale(PictureInfo... pictureInfoArray) {
-		if (mMaxWidth <= 0 && mMaxHeight <= 0) {
+	void executeScale(ArrayList<PictureInfo> pictureInfoList) {
+		if (this.kpPicker.pickMaxWidth <= 0 && this.kpPicker.pickMaxHeight <= 0) {
 			ArrayList<Uri> pictureUriList = new ArrayList<>();
-			for (PictureInfo pictureInfo : pictureInfoArray) {
-				pictureUriList.add(pictureInfo.getPictureUri());
+			for (PictureInfo pictureInfo : pictureInfoList) {
+				pictureUriList.add(pictureInfo.pictureUri);
 			}
-			mOnScaleListener.scaleResult(pictureUriList);
+			this.onScaleListener.onScale(pictureUriList);
 		} else {
-			execute(pictureInfoArray);
+			execute((PictureInfo[]) pictureInfoList.toArray());
 		}
 	}
-
-	@Override
-	protected void onPreExecute() {
-		mOnScaleListener.scaleStart();
-	}
-
+	
 	@Override
 	protected ArrayList<Uri> doInBackground(PictureInfo... pictureInfoArray) {
 		ArrayList<Uri> pictureUriList = new ArrayList<>();
-
+		
 		FileInputStream input = null;
 		FileOutputStream output = null;
 		for (PictureInfo pictureInfo : pictureInfoArray) {
-			PictureInfo outputPictureInfo = PictureInfo.createPictureInfo();
+			if (isCancelled()) {
+				break;
+			}
+			
+			PictureInfo outputPictureInfo = this.kpPicker.createPictureInfo();
 			try {
-				input = new FileInputStream(pictureInfo.getPicturePath());
-				output = new FileOutputStream(outputPictureInfo.getPicturePath());
-
-				BitmapFactory.Options options = calculateBitmapOptions(pictureInfo.getPicturePath());
+				input = new FileInputStream(pictureInfo.picturePath);
+				output = new FileOutputStream(outputPictureInfo.picturePath);
+				
+				BitmapFactory.Options options = calculateBitmapOptions(pictureInfo.picturePath);
 				options.inJustDecodeBounds = false;
 				Bitmap bitmap = BitmapFactory.decodeStream(input, null, options);
-				if (AlbumTask.IMAGE_PNG.equalsIgnoreCase(options.outMimeType)) {
+				if (IMAGE_PNG.equalsIgnoreCase(options.outMimeType)) {
 					bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
 				} else {
 					bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
 				}
-
+				
 				// pictureInfo.removePictureInfo();
-				pictureUriList.add(outputPictureInfo.getPictureUri());
+				pictureUriList.add(outputPictureInfo.pictureUri);
 			} catch (Exception error) {
-				outputPictureInfo.removePictureInfo();
-				pictureUriList.add(pictureInfo.getPictureUri());
+				this.kpPicker.removePictureInfo(outputPictureInfo);
+				pictureUriList.add(pictureInfo.pictureUri);
 			} catch (OutOfMemoryError error) {
 				System.gc();
-				outputPictureInfo.removePictureInfo();
-				pictureUriList.add(pictureInfo.getPictureUri());
+				this.kpPicker.removePictureInfo(outputPictureInfo);
+				pictureUriList.add(pictureInfo.pictureUri);
 			} finally {
 				closeSilently(input);
 				closeSilently(output);
 			}
 		}
-
 		return pictureUriList;
 	}
-
+	
 	@Override
-	protected void onPostExecute(ArrayList<Uri> pictureList) {
-		if (isCancelled()) {
-			return;
-		}
-		mOnScaleListener.scaleResult(pictureList);
+	protected void onPostExecute(ArrayList<Uri> pictureUriList) {
+		this.onScaleListener.onScale(pictureUriList);
 	}
-
+	
 	/**
 	 * 计算图片信息
 	 *
@@ -120,16 +105,16 @@ class ScaleTask extends AsyncTask<PictureInfo, Void, ArrayList<Uri>> {
 		} finally {
 			closeSilently(input);
 		}
-
+		
 		int sampleSize = 1;
-		while ((mMaxWidth > 0 && options.outWidth / sampleSize > mMaxWidth)
-				|| (mMaxHeight > 0 && options.outHeight / sampleSize > mMaxHeight)) {
+		while ((this.kpPicker.pickMaxWidth > 0 && options.outWidth / sampleSize > this.kpPicker.pickMaxWidth)
+				|| (this.kpPicker.pickMaxHeight > 0 && options.outHeight / sampleSize > this.kpPicker.pickMaxHeight)) {
 			sampleSize = sampleSize << 1;
 		}
 		options.inSampleSize = sampleSize;
 		return options;
 	}
-
+	
 	private void closeSilently(Closeable close) {
 		try {
 			if (close != null) {
@@ -138,22 +123,17 @@ class ScaleTask extends AsyncTask<PictureInfo, Void, ArrayList<Uri>> {
 		} catch (IOException ignored) {
 		}
 	}
-
+	
 	/**
 	 * 图片缩放监听
 	 */
 	interface OnScaleListener {
-
+		
 		/**
-		 * 开始缩放
-		 */
-		void scaleStart();
-
-		/**
-		 * 缩放结果
+		 * 缩放列表数据
 		 *
 		 * @param pictureUriList 图片地址列表
 		 */
-		void scaleResult(ArrayList<Uri> pictureUriList);
+		void onScale(ArrayList<Uri> pictureUriList);
 	}
 }

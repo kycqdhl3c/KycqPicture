@@ -2,7 +2,6 @@ package com.kycq.library.picture.picker;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,299 +15,192 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.kycq.library.picture.R;
 
-import java.util.ArrayList;
-
-class PictureListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-	/** 拍照 */
-	private static final int CAMERA = 1;
-	/** 图片 */
-	private static final int PICTURE = 2;
-
-	private LayoutInflater mInflater;
-	/** 输出图片数量 */
-	private int mPickerCount;
-	/** 选中标签数列 */
-	private SparseBooleanArray mCheckedArray = new SparseBooleanArray();
-
-	/** 图片信息列表 */
-	private ArrayList<PictureInfo> mPictureInfoList = new ArrayList<>();
-
-	/** 图片获取监听 */
-	private OnPickerListener mOnPickerListener;
-
-	/**
-	 * 构造方法
-	 *
-	 * @param context     设备上下文环境
-	 * @param pickerCount 输出图片数量
-	 */
-	PictureListAdapter(Context context, int pickerCount) {
-		mInflater = LayoutInflater.from(context);
-		mPickerCount = pickerCount;
+class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.PictureHolder> {
+	private LayoutInflater inflater;
+	
+	private AlbumInfo albumInfo;
+	private OnPictureListener onPictureListener;
+	
+	PictureListAdapter(Context context,
+	                   AlbumInfo albumInfo,
+	                   OnPictureListener onPictureListener) {
+		this.inflater = LayoutInflater.from(context);
+		this.albumInfo = albumInfo;
+		this.onPictureListener = onPictureListener;
 	}
-
-	/**
-	 * 设置图片信息列表
-	 *
-	 * @param pictureInfoList 图片信息列表
-	 */
-	void setPictureInfoList(ArrayList<PictureInfo> pictureInfoList) {
-		mPictureInfoList.addAll(pictureInfoList);
-		notifyDataSetChanged();
-	}
-
-	/**
-	 * 添加图片信息
-	 *
-	 * @param pictureInfo 图片信息
-	 */
-	void addPictureInfo(PictureInfo pictureInfo) {
-		SparseBooleanArray checkedArray = new SparseBooleanArray();
-		for (int index = mCheckedArray.size() - 1; index >= 0; index--) {
-			int key = mCheckedArray.keyAt(index);
-			boolean value = mCheckedArray.valueAt(index);
-			checkedArray.append(key + 1, value);
-		}
-
-		mPictureInfoList.add(0, pictureInfo);
-		notifyItemRangeInserted(1, 1);
-	}
-
-	/**
-	 * 获取选中图片信息数组
-	 *
-	 * @return 选中图片信息数组
-	 */
-	PictureInfo[] getPictureInfoArray() {
-		PictureInfo[] pictureInfoArray = new PictureInfo[mCheckedArray.size()];
-		for (int index = mCheckedArray.size() - 1; index >= 0; index--) {
-			pictureInfoArray[index] = mPictureInfoList.get(mCheckedArray.keyAt(index));
-		}
-		return pictureInfoArray;
-	}
-
+	
 	/**
 	 * 选中图片
 	 *
-	 * @param picturePosition 图片列表位置
+	 * @param pictureInfo 图片信息
 	 */
-	void pickerPictureUri(int picturePosition) {
-		PictureInfo pictureInfo = mPictureInfoList.get(picturePosition);
+	void notifyPickPicture(PictureInfo pictureInfo) {
+		if (this.onPictureListener.onPicture(pictureInfo)) {
+			notifyItemInserted(1);
+		}
+	}
+	
+	/**
+	 * 选中图片
+	 *
+	 * @param adapterPosition 图片列表位置
+	 */
+	private void pickPicture(int adapterPosition) {
+		PictureInfo pictureInfo = getItem(adapterPosition);
 		if (!pictureInfo.isAvailable()) {
-			Toast.makeText(mInflater.getContext(), R.string.kp_picture_error, Toast.LENGTH_SHORT).show();
+			Toast.makeText(inflater.getContext(), R.string.kp_picture_error, Toast.LENGTH_SHORT).show();
 			return;
 		}
-
-		if (isSingle()) {
-			if (mCheckedArray.size() > 0) {
-				mCheckedArray.delete(mCheckedArray.keyAt(0));
-			}
-			mCheckedArray.put(picturePosition, true);
-		} else {
-			boolean value = mCheckedArray.get(picturePosition);
-			if (value) {
-				mCheckedArray.delete(picturePosition);
-			} else {
-				if (mPickerCount == mCheckedArray.size()) {
-					return;
-				}
-				mCheckedArray.put(picturePosition, true);
-			}
-			notifyItemChanged(getAdapterPosition(picturePosition));
+		
+		if (onPictureListener.onPicture(pictureInfo)) {
+			notifyItemChanged(adapterPosition);
 		}
-
-		mOnPickerListener.onPicker(pictureInfo, mCheckedArray.size(), mPickerCount);
 	}
-
+	
 	/**
-	 * 是否输出唯一图片
+	 * 预览图片
 	 *
-	 * @return true唯一
+	 * @param adapterPosition 图片列表位置
 	 */
-	boolean isSingle() {
-		return mPickerCount == 1;
+	private void pickPreview(int adapterPosition) {
+		if (this.albumInfo.isFullAlbum()) {
+			if (adapterPosition == 0) {
+				onPictureListener.onCamera();
+			} else {
+				onPictureListener.onPreview(adapterPosition - 1);
+			}
+		} else {
+			onPictureListener.onPreview(adapterPosition);
+		}
 	}
-
-	/**
-	 * 获取图片列表位置
-	 *
-	 * @param adapterPosition 图片控件位置
-	 * @return 图片列表位置
-	 */
-	private int getPicturePosition(int adapterPosition) {
-		return adapterPosition - 1;
+	
+	private PictureInfo getItem(int position) {
+		if (this.albumInfo.isFullAlbum()) {
+			return this.albumInfo.pictureInfoList.get(position - 1);
+		}
+		return this.albumInfo.pictureInfoList.get(position);
 	}
-
-	/**
-	 * 获取图片控件位置
-	 *
-	 * @param picturePosition 图片列表位置
-	 * @return 图片控件位置
-	 */
-	private int getAdapterPosition(int picturePosition) {
-		return picturePosition + 1;
-	}
-
-	/**
-	 * 设置图片获取监听
-	 *
-	 * @param listener 图片获取监听
-	 */
-	void setOnPickerListener(OnPickerListener listener) {
-		mOnPickerListener = listener;
-	}
-
+	
 	@Override
 	public int getItemCount() {
-		return mPictureInfoList != null ? mPictureInfoList.size() + 1 : 1;
-	}
-
-	@Override
-	public int getItemViewType(int position) {
-		return position == 0 ? CAMERA : PICTURE;
-	}
-
-	@Override
-	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		if (viewType == PICTURE) {
-			return new PictureHolder(mInflater.inflate(R.layout.kp_item_picture_list, parent, false));
-		} else if (viewType == CAMERA) {
-			return new CameraHolder(mInflater.inflate(R.layout.kp_item_camera_list, parent, false));
+		int count = this.albumInfo.pictureInfoList.size();
+		if (this.albumInfo.isFullAlbum()) {
+			count++;
 		}
-		return null;
+		return count;
 	}
-
+	
 	@Override
-	public void onBindViewHolder(final RecyclerView.ViewHolder holder, int adapterPosition) {
-		int viewType = holder.getItemViewType();
-		if (viewType == PICTURE) {
-			PictureHolder pictureHolder = (PictureHolder) holder;
-
-			int picturePosition = getPicturePosition(adapterPosition);
-
-			pictureHolder.setPictureInfo(mPictureInfoList.get(picturePosition));
-
-			if (isSingle()) {
-				pictureHolder.ivChecked.setVisibility(View.INVISIBLE);
-			} else {
-				boolean value = mCheckedArray.get(picturePosition);
-				if (value) {
-					pictureHolder.ivChecked.setVisibility(View.VISIBLE);
-				} else {
-					pictureHolder.ivChecked.setVisibility(View.INVISIBLE);
-				}
-			}
+	public PictureHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		return new PictureHolder(this.inflater.inflate(R.layout.kp_item_picture_list, parent, false));
+	}
+	
+	@Override
+	public void onBindViewHolder(PictureHolder holder, int position) {
+		if (this.albumInfo.isFullAlbum() && position == 0) {
+			holder.setCameraInfo();
+		} else {
+			holder.setPictureInfo(getItem(position));
 		}
 	}
-
-	/**
-	 * 图片控件展示信息
-	 */
-	private class PictureHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-		/** 图片展示控件 */
-		private SimpleDraweeView pictureView;
-		/** 图片选中控件 */
-		private ImageView ivChecked;
-
-		/** 图片信息 */
-		private PictureInfo mPictureInfo;
-
+	
+	class PictureHolder extends RecyclerView.ViewHolder {
+		private SimpleDraweeView kpPictureView;
+		private View kpLayer;
+		private ImageView kpSelected;
+		
 		PictureHolder(View itemView) {
 			super(itemView);
-
-			itemView.setOnClickListener(this);
-			pictureView = (SimpleDraweeView) itemView.findViewById(R.id.kpPictureView);
-			ivChecked = (ImageView) itemView.findViewById(R.id.kpIVChecked);
-
-			// 设置图片展示控件属性
-			pictureView.setAspectRatio(1.0f);
-			pictureView.getHierarchy()
+			
+			itemView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					pickPreview(getAdapterPosition());
+				}
+			});
+			this.kpPictureView = (SimpleDraweeView) itemView.findViewById(R.id.kpPictureView);
+			this.kpLayer = itemView.findViewById(R.id.kpLayer);
+			this.kpSelected = (ImageView) itemView.findViewById(R.id.kpSelected);
+			this.kpSelected.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					pickPicture(getAdapterPosition());
+				}
+			});
+		}
+		
+		void setCameraInfo() {
+			this.itemView.setBackgroundColor(0xFF000000);
+			this.kpPictureView.setAspectRatio(1.0f);
+			this.kpPictureView.getHierarchy()
+					.setPlaceholderImage(
+							R.drawable.kp_ic_camera,
+							ScalingUtils.ScaleType.CENTER_INSIDE
+					);
+			this.kpLayer.setVisibility(View.GONE);
+			this.kpSelected.setVisibility(View.GONE);
+		}
+		
+		void setPictureInfo(PictureInfo pictureInfo) {
+			this.itemView.setBackgroundColor(0x00000000);
+			this.kpPictureView.setAspectRatio(1.0f);
+			this.kpPictureView.getHierarchy()
 					.setPlaceholderImage(
 							R.drawable.kp_ic_picture_loading,
 							ScalingUtils.ScaleType.FIT_XY
 					);
-			pictureView.getHierarchy()
+			this.kpPictureView.getHierarchy()
 					.setFailureImage(
 							R.drawable.kp_ic_picture_error,
 							ScalingUtils.ScaleType.FIT_XY
 					);
-		}
-
-		/**
-		 * 设置图片信息
-		 *
-		 * @param pictureInfo 图片信息
-		 */
-		void setPictureInfo(PictureInfo pictureInfo) {
-			if (pictureInfo.equals(mPictureInfo)) {
-				return;
+			
+			this.kpLayer.setVisibility(View.VISIBLE);
+			this.kpSelected.setVisibility(View.VISIBLE);
+			if (pictureInfo.selected) {
+				this.kpLayer.setBackgroundResource(R.color.kpPictureSelectedColor);
+				this.kpSelected.setImageResource(R.drawable.kp_ic_picture_check_selected);
+			} else {
+				this.kpLayer.setBackgroundResource(R.color.kpPictureUnSelectedColor);
+				this.kpSelected.setImageResource(R.drawable.kp_ic_picture_check_unselected);
 			}
-			mPictureInfo = pictureInfo;
-
-			pictureView.setController(
+			
+			this.kpPictureView.setController(
 					Fresco.newDraweeControllerBuilder()
-							.setOldController(
-									pictureView.getController()
-							)
+							.setOldController(this.kpPictureView.getController())
 							.setImageRequest(
-									ImageRequestBuilder.newBuilderWithSource(pictureInfo.getPictureUri())
+									ImageRequestBuilder
+											.newBuilderWithSource(pictureInfo.pictureUri)
 											.setResizeOptions(new ResizeOptions(300, 300))
 											.build()
 							)
 							.build()
 			);
 		}
-
-		@Override
-		public void onClick(View view) {
-			pickerPictureUri(getPicturePosition(getAdapterPosition()));
-		}
-
 	}
-
-	/**
-	 * 拍照控件展示信息
-	 */
-	private class CameraHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-		private SimpleDraweeView ivCamera;
-
-		CameraHolder(View itemView) {
-			super(itemView);
-
-			itemView.setOnClickListener(this);
-			ivCamera = (SimpleDraweeView) itemView.findViewById(R.id.kpIVCamera);
-
-			// 设置拍照展示控件属性
-			ivCamera.setAspectRatio(1.0f);
-			ivCamera.getHierarchy()
-					.setPlaceholderImage(
-							R.drawable.kp_ic_picture_camera,
-							ScalingUtils.ScaleType.CENTER_INSIDE
-					);
-		}
-
-		@Override
-		public void onClick(View v) {
-			mOnPickerListener.onCamera();
-		}
-	}
-
+	
 	/**
 	 * 图片获取监听
 	 */
-	interface OnPickerListener {
+	interface OnPictureListener {
 		/**
 		 * 拍照
 		 */
 		void onCamera();
-
+		
 		/**
-		 * 选择
+		 * 选择图片
 		 *
-		 * @param pictureInfo  图片信息
-		 * @param currentCount 当前图片数量
-		 * @param pickerCount  输出图片数量
+		 * @param pictureInfo 图片信息
+		 * @return true:有效操作 false:无效操作
 		 */
-		void onPicker(PictureInfo pictureInfo, int currentCount, int pickerCount);
+		boolean onPicture(PictureInfo pictureInfo);
+		
+		/**
+		 * 预览
+		 *
+		 * @param position 图片列表位置
+		 */
+		void onPreview(int position);
 	}
 }

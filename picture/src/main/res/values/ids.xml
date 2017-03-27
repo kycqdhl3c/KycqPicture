@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<item name="kpRecyclerView" type="id"/>
-	<item name="kpViewPager" type="id"/>
+	<item name="kpBack" type="id"/>
+	<item name="kpPick" type="id"/>
+	
+	<item name="kpRecyclerViewPicture" type="id"/>
+	<item name="kpLayer" type="id"/>
+	
+	<item name="kpAlbumLayer" type="id"/>
+	<item name="kpRecyclerViewAlbum" type="id"/>
+	
+	<item name="kpActionbar" type="id"/>
+	<item name="kpAlbum" type="id"/>
+	<item name="kpAlbumName" type="id"/>
+	<item name="kpPreview" type="id"/>
+	
 	<item name="kpPictureView" type="id"/>
-	<item name="kpMenuPicker" type="id"/>
-	<item name="kpMenuDelete" type="id"/>
-	<item name="kpIVCamera" type="id"/>
-	<item name="kpIVChecked" type="id"/>
+	<item name="kpTitle" type="id"/>
+	<item name="kpContent" type="id"/>
+	<item name="kpSelected" type="id"/>
 </resources>

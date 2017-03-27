@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@color/kpActionBarColor">
+	
+	<ImageView
+		android:id="@id/kpBack"
+		android:layout_width="@dimen/kpActionBarSize"
+		android:layout_height="@dimen/kpActionBarSize"
+		android:background="?android:attr/selectableItemBackground"
+		android:scaleType="centerInside"
+		android:src="@drawable/kp_ic_back"/>
+	
+	<TextView
+		android:id="@id/kpTitle"
+		android:layout_width="0dp"
+		android:layout_height="@dimen/kpActionBarSize"
+		android:layout_weight="1.0"
+		android:gravity="center_vertical"
+		android:textColor="@android:color/white"
+		android:textSize="18sp"/>
+	
+	<ImageView
+		android:id="@id/kpPick"
+		android:layout_width="@dimen/kpActionBarSize"
+		android:layout_height="@dimen/kpActionBarSize"
+		android:background="?android:attr/selectableItemBackground"
+		android:scaleType="centerInside"
+		android:src="@drawable/kp_ic_done"/>
+</LinearLayout>
