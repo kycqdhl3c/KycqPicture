@@ -447,7 +447,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		showLoading();
 		this.compressTask = new CompressTask(
 				this,
-				this.kpPicker.pickMaxWidth, this.kpPicker.pickMaxHeight,
+				this.kpPicker.pickMaxWidth, this.kpPicker.pickMaxHeight, this.kpPicker.pickMaxSize,
 				new CompressTask.OnCompressListener() {
 					@Override
 					public void onCompress(ArrayList<Uri> pictureUriList) {

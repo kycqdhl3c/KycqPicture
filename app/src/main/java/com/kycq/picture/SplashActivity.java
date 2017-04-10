@@ -63,7 +63,8 @@ public class SplashActivity extends AppCompatActivity {
 			public void onInsert() {
 				new KPPicker.Builder()
 						.pickCount(mDataBinding.pictureLayout.getMaxCount() - mDataBinding.pictureLayout.size())
-						.pickMaxSize(1080, 0)
+						// .pickMaxScale(1080, 0)
+						.pickMaxSize(200 * 1024)
 						.pickEditable(isCrop)
 						.pick(SplashActivity.this, PICKER);
 			}

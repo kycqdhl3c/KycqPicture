@@ -29,6 +29,7 @@ public class KPPicker implements Parcelable {
 	int pickAspectY;
 	int pickMaxWidth;
 	int pickMaxHeight;
+	long pickMaxSize;
 	boolean pickEditable;
 	
 	AlbumInfo fullAlbumInfo;
@@ -50,6 +51,7 @@ public class KPPicker implements Parcelable {
 		pickAspectY = in.readInt();
 		pickMaxWidth = in.readInt();
 		pickMaxHeight = in.readInt();
+		pickMaxSize = in.readLong();
 		pickEditable = in.readByte() != 0;
 		selectedAlbumInfo = in.readParcelable(AlbumInfo.class.getClassLoader());
 		pictureInfoList = in.createTypedArrayList(PictureInfo.CREATOR);
@@ -65,6 +67,7 @@ public class KPPicker implements Parcelable {
 		dest.writeInt(pickAspectY);
 		dest.writeInt(pickMaxWidth);
 		dest.writeInt(pickMaxHeight);
+		dest.writeLong(pickMaxSize);
 		dest.writeByte((byte) (pickEditable ? 1 : 0));
 		dest.writeParcelable(selectedAlbumInfo, flags);
 		dest.writeTypedList(pictureInfoList);
@@ -158,6 +161,7 @@ public class KPPicker implements Parcelable {
 		int pickAspectY;
 		int pickMaxWidth;
 		int pickMaxHeight;
+		long pickMaxSize;
 		boolean pickEditable;
 		
 		public Builder pickFullAlbumName(String fullAlbumName) {
@@ -181,9 +185,14 @@ public class KPPicker implements Parcelable {
 			return this;
 		}
 		
-		public Builder pickMaxSize(int pickMaxWidth, int pickMaxHeight) {
+		public Builder pickMaxScale(int pickMaxWidth, int pickMaxHeight) {
 			this.pickMaxWidth = pickMaxWidth;
 			this.pickMaxHeight = pickMaxHeight;
+			return this;
+		}
+		
+		public Builder pickMaxSize(long pickMaxSize) {
+			this.pickMaxSize = pickMaxSize;
 			return this;
 		}
 		
@@ -238,6 +247,7 @@ public class KPPicker implements Parcelable {
 			kpPicker.pickAspectY = this.pickAspectY;
 			kpPicker.pickMaxWidth = this.pickMaxWidth;
 			kpPicker.pickMaxHeight = this.pickMaxHeight;
+			kpPicker.pickMaxSize = this.pickMaxSize;
 			kpPicker.pickEditable = this.pickEditable;
 			return kpPicker;
 		}
