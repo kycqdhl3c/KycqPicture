@@ -1,19 +1,31 @@
 package com.kycq.library.picture.picker;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.File;
 import java.util.ArrayList;
 
-class AlbumInfo {
+class AlbumInfo implements Parcelable {
 	/** 相册路径 */
-	public String albumPath;
+	String albumPath;
 	/** 相册名称 */
-	public String albumName;
+	String albumName;
 	/** 相册图片信息列表 */
-	public ArrayList<PictureInfo> pictureInfoList = new ArrayList<>();
+	ArrayList<PictureInfo> pictureInfoList = new ArrayList<>();
+	
+	private AlbumInfo() {
+	}
+	
+	private AlbumInfo(Parcel in) {
+		albumPath = in.readString();
+		albumName = in.readString();
+		pictureInfoList = in.createTypedArrayList(PictureInfo.CREATOR);
+	}
 	
 	static AlbumInfo buildByName(String albumName) {
 		AlbumInfo albumInfo = new AlbumInfo();
-		albumInfo.albumPath = null;
+		albumInfo.albumPath = "";
 		albumInfo.albumName = albumName;
 		return albumInfo;
 	}
@@ -31,7 +43,11 @@ class AlbumInfo {
 	 * @return true是
 	 */
 	boolean isFullAlbum() {
-		return this.albumPath == null;
+		return this.albumPath == null || this.albumPath.equals("");
+	}
+	
+	int size() {
+		return this.pictureInfoList.size();
 	}
 	
 	@Override
@@ -50,4 +66,28 @@ class AlbumInfo {
 		}
 		return false;
 	}
+	
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(albumPath);
+		dest.writeString(albumName);
+		dest.writeTypedList(pictureInfoList);
+	}
+	
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+	
+	public static final Creator<AlbumInfo> CREATOR = new Creator<AlbumInfo>() {
+		@Override
+		public AlbumInfo createFromParcel(Parcel in) {
+			return new AlbumInfo(in);
+		}
+		
+		@Override
+		public AlbumInfo[] newArray(int size) {
+			return new AlbumInfo[size];
+		}
+	};
 }

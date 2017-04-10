@@ -24,13 +24,20 @@
 			android:layout_height="wrap_content"
 			android:orientation="vertical">
 			
+			<android.support.v4.view.ViewPager
+				android:id="@+id/viewPager"
+				android:layout_width="match_parent"
+				android:layout_height="200dp"
+				android:background="@android:color/white"/>
+			
 			<GridLayout
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:background="@android:color/white"
 				android:orientation="vertical"
 				android:paddingLeft="10dp"
-				android:paddingRight="10dp">
+				android:paddingRight="10dp"
+				android:visibility="gone">
 				
 				<TextView
 					android:layout_width="wrap_content"
@@ -130,18 +137,19 @@
 			
 			<com.kycq.library.picture.widget.PictureLayout
 				android:id="@+id/pictureLayout"
-				android:layout_width="wrap_content"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:background="@android:color/white"
 				android:padding="10dp"
+				app:picture_editDrawable="@drawable/ic_delete_picture"
 				app:picture_horizontalPadding="10dp"
 				app:picture_maxCount="8"
 				app:picture_pictureRatio="1"
-				app:picture_pictureUpload="true"
-				app:picture_pictureView="@layout/include_picture_view"
-				app:picture_rowCount="4"
-				app:picture_uploadBackground="@drawable/bg_dash_box"
-				app:picture_uploadPicture="@mipmap/img_upload_picture"
-				app:picture_verticalPadding="10dp"/>
+				app:picture_pictureViewLayout="@layout/include_picture_view"
+				app:picture_rowCount="5"
+				app:picture_supportInsert="true"
+				app:picture_insertBackground="@mipmap/img_upload"/>
 		</LinearLayout>
 	</ScrollView>
 

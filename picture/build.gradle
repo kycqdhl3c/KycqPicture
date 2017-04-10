@@ -17,6 +17,7 @@ android {
 			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 		}
 	}
+	resourcePrefix 'kp_'
 	
 	libraryVariants.all { variant ->
 		variant.outputs.each { output ->
@@ -51,14 +52,14 @@ android {
 }
 
 dependencies {
+	testCompile 'junit:junit:4.12'
 	androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
 		exclude group: 'com.android.support', module: 'support-annotations'
 	})
 	
 	compile fileTree(include: ['*.jar'], dir: 'libs')
-	compile 'com.android.support.constraint:constraint-layout:1.0.2'
-	testCompile 'junit:junit:4.12'
-	provided 'com.android.support:appcompat-v7:25.3.0'
-	provided 'com.android.support:recyclerview-v7:25.3.0'
+	
+	provided 'com.android.support:appcompat-v7:25.3.1'
+	provided 'com.android.support:recyclerview-v7:25.3.1'
 	provided 'com.facebook.fresco:fresco:1.1.0'
 }

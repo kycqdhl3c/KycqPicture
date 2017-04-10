@@ -20,8 +20,9 @@
 				android:resource="@xml/kp_picture_paths"/>
 		</provider>
 		
-		<activity android:name=".picker.KPPicturePickerActivity">
-		</activity>
+		<activity android:name=".picker.KPPicturePickerActivity"/>
+		<activity android:name=".picker.KPPicturePreviewActivity"/>
+		<activity android:name=".viewer.KPPictureViewerActivity"/>
 	</application>
 
 </manifest>

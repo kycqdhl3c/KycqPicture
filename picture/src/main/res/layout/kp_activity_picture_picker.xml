@@ -77,7 +77,7 @@
 			android:layout_height="wrap_content"
 			android:background="?android:attr/selectableItemBackground"
 			android:padding="12dp"
-			android:textColor="@android:color/white"
+			android:textColor="@color/kp_tv_alter"
 			android:textSize="14sp"
 			tools:text="@string/kp_preview"/>
 	</LinearLayout>

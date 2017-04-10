@@ -1,8 +1,10 @@
 package com.kycq.library.picture.picker;
 
 import android.Manifest;
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,16 +33,17 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	/** 读取文件权限 */
 	private static final int PERMISSION_STORAGE = 1;
 	
-	/** 获取图片 */
-	private static final int PICTURE = 1;
-	/** 裁剪图片 */
+	/** 拍照 */
+	private static final int CAMERA = 1;
+	/** 裁剪 */
 	private static final int CROP = 2;
+	/** 预览 */
+	private static final int PREVIEW = 3;
 	
 	/** 选择参数信息 */
 	private KPPicker kpPicker;
 	
-	private TextView kpTitle;
-	
+	private View kpDone;
 	private RecyclerView kpRecyclerViewPicture;
 	private View kpAlbumLayer;
 	private RecyclerView kpRecyclerViewAlbum;
@@ -55,13 +58,13 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	private Animation albumHideAnimation;
 	
 	private AlbumTask albumTask;
+	
 	private AlbumListAdapter albumListAdapter;
 	private PictureListAdapter pictureListAdapter;
 	
-	private ArrayList<PictureInfo> pictureInfoList = new ArrayList<>();
-	private PictureInfo tempPictureInfo;
+	private CompressTask compressTask;
 	
-	private ScaleTask scaleTask;
+	private boolean isPreviewDone;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +80,20 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 			finish();
 			return;
 		}
+		if (savedInstanceState != null) {
+			this.kpPicker = savedInstanceState.getParcelable(KPPicker.PICKER);
+		}
 		
 		observeViews();
 		observeToolbar();
-		toggleToolbar();
+		alterPickCount();
 		requestAlbum();
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putParcelable(KPPicker.PICKER, this.kpPicker);
 	}
 	
 	private void observeViews() {
@@ -114,6 +126,15 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		});
 		this.kpAlbumName = (TextView) findViewById(R.id.kpAlbumName);
 		this.kpPreview = (TextView) findViewById(R.id.kpPreview);
+		this.kpPreview.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(KPPicturePickerActivity.this, KPPicturePreviewActivity.class);
+				intent.putExtra(KPPicker.PICKER, KPPicturePickerActivity.this.kpPicker);
+				intent.putExtra(KPPicturePreviewActivity.PREVIEW_PICTURE_POSITION, 0);
+				startActivityForResult(intent, PREVIEW);
+			}
+		});
 		
 		this.layerShowAnimation = new AlphaAnimation(0F, 1F);
 		this.layerShowAnimation.setDuration(400);
@@ -162,90 +183,6 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		});
 	}
 	
-	private void observeToolbar() {
-		assert getSupportActionBar() != null;
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		getSupportActionBar().setCustomView(R.layout.kp_picture_picker_toolbar);
-		
-		View customView = getSupportActionBar().getCustomView();
-		Toolbar toolbar = (Toolbar) customView.getParent();
-		toolbar.setContentInsetsAbsolute(0, 0);
-		toolbar.setLayoutParams(
-				new FrameLayout.LayoutParams(
-						FrameLayout.LayoutParams.MATCH_PARENT,
-						getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)
-				)
-		);
-		
-		View kpBack = customView.findViewById(R.id.kpBack);
-		kpBack.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onBackPressed();
-			}
-		});
-		View kpPick = customView.findViewById(R.id.kpPick);
-		kpPick.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				requestScale();
-			}
-		});
-		this.kpTitle = (TextView) customView.findViewById(R.id.kpTitle);
-	}
-	
-	private void toggleToolbar() {
-		if (this.kpPicker.pickCount == 1) {
-			this.kpTitle.setText(R.string.kp_select_picture);
-		} else {
-			this.kpTitle.setText(
-					getString(R.string.kp_format_select_picture,
-							this.pictureInfoList.size(), this.kpPicker.pickCount)
-			);
-		}
-	}
-	
-	private void requestAlbum() {
-		if (!requestStoragePermission()) {
-			return;
-		}
-		this.albumTask = new AlbumTask(
-				this.kpPicker, this.getContentResolver(),
-				new AlbumTask.OnAlbumListener() {
-					@Override
-					public void onAlbum(ArrayList<AlbumInfo> albumInfoList) {
-						kpActionbar.setVisibility(View.VISIBLE);
-						observeAlbumList(albumInfoList);
-					}
-				});
-		this.albumTask.execute();
-	}
-	
-	private void observeAlbumList(ArrayList<AlbumInfo> albumInfoList) {
-		this.kpRecyclerViewAlbum.setLayoutManager(new LinearLayoutManager(this));
-		this.kpRecyclerViewAlbum.getItemAnimator().setChangeDuration(0);
-		this.kpRecyclerViewAlbum.getItemAnimator().setAddDuration(0);
-		this.kpRecyclerViewAlbum.getItemAnimator().setMoveDuration(0);
-		this.kpRecyclerViewAlbum.getItemAnimator().setRemoveDuration(0);
-		
-		this.albumListAdapter = new AlbumListAdapter(
-				this, albumInfoList,
-				new AlbumListAdapter.OnAlbumListener() {
-					@Override
-					public void onAlbum(AlbumInfo albumInfo) {
-						if (kpAlbumLayer.getVisibility() == View.VISIBLE) {
-							toggleAlbumAndLayer();
-						}
-						kpAlbumName.setText(albumInfo.albumName);
-						observePictureList(albumInfo);
-					}
-				}
-		);
-		this.kpRecyclerViewAlbum.setAdapter(this.albumListAdapter);
-	}
-	
 	private void toggleAlbumAndLayer() {
 		if (this.kpAlbumLayer.getVisibility() == View.VISIBLE) {
 			this.kpAlbumLayer.startAnimation(this.layerHideAnimation);
@@ -258,6 +195,121 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		}
 	}
 	
+	private void observeToolbar() {
+		assert getSupportActionBar() != null;
+		getSupportActionBar().setDisplayShowHomeEnabled(false);
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		getSupportActionBar().setCustomView(R.layout.kp_picture_picker_toolbar);
+		
+		View customView = getSupportActionBar().getCustomView();
+		Toolbar toolbar = (Toolbar) customView.getParent();
+		toolbar.setContentInsetsAbsolute(0, 0);
+		toolbar.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)));
+		
+		View kpBack = customView.findViewById(R.id.kpBack);
+		kpBack.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onBackPressed();
+			}
+		});
+		this.kpDone = customView.findViewById(R.id.kpDone);
+		this.kpDone.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				requestCompress();
+			}
+		});
+	}
+	
+	private void alterPickCount() {
+		if (this.kpPicker.pickCount == 1) {
+			this.kpPreview.setText(R.string.kp_preview);
+			this.kpPreview.setVisibility(View.INVISIBLE);
+			this.kpPreview.setEnabled(false);
+			this.kpDone.setVisibility(View.GONE);
+		} else {
+			this.kpPreview.setText(
+					getString(R.string.kp_format_preview,
+							this.kpPicker.pictureInfoList.size(), this.kpPicker.pickCount)
+			);
+			this.kpPreview.setEnabled(this.kpPicker.pictureInfoList.size() > 0);
+			this.kpDone.setEnabled(this.kpPicker.pictureInfoList.size() > 0);
+		}
+	}
+	
+	private void requestAlbum() {
+		if (!requestStoragePermission()) {
+			return;
+		}
+		this.albumTask = new AlbumTask(
+				this.kpPicker.fullAlbumName, this.kpPicker.cacheAlbumPath,
+				this.getContentResolver(),
+				new AlbumTask.OnAlbumListener() {
+					@Override
+					public void onAlbum(AlbumInfo fullAlbumInfo,
+					                    AlbumInfo cacheAlbumInfo,
+					                    ArrayList<AlbumInfo> albumInfoList) {
+						kpPicker.fullAlbumInfo = fullAlbumInfo;
+						kpPicker.cacheAlbumInfo = cacheAlbumInfo;
+						kpPicker.albumInfoList = albumInfoList;
+						
+						selectPictureInfoList();
+						
+						kpActionbar.setVisibility(View.VISIBLE);
+						observeAlbumList();
+					}
+				});
+		this.albumTask.execute();
+	}
+	
+	private void selectPictureInfoList() {
+		AlbumInfo fullAlbumInfo = this.kpPicker.fullAlbumInfo;
+		ArrayList<PictureInfo> pictureInfoList = this.kpPicker.pictureInfoList;
+		ArrayList<PictureInfo> resultInfoList = new ArrayList<>();
+		for (PictureInfo pictureInfo : pictureInfoList) {
+			int index = fullAlbumInfo.pictureInfoList.indexOf(pictureInfo);
+			if (index >= 0) {
+				PictureInfo selectedPictureInfo = fullAlbumInfo.pictureInfoList.get(index);
+				selectedPictureInfo.selected = true;
+				resultInfoList.add(selectedPictureInfo);
+			} else {
+				pictureInfo.selected = false;
+			}
+		}
+		this.kpPicker.pictureInfoList = resultInfoList;
+	}
+	
+	private void observeAlbumList() {
+		this.kpRecyclerViewAlbum.setLayoutManager(new LinearLayoutManager(this));
+		this.kpRecyclerViewAlbum.getItemAnimator().setChangeDuration(0);
+		this.kpRecyclerViewAlbum.getItemAnimator().setAddDuration(0);
+		this.kpRecyclerViewAlbum.getItemAnimator().setMoveDuration(0);
+		this.kpRecyclerViewAlbum.getItemAnimator().setRemoveDuration(0);
+		
+		this.albumListAdapter = new AlbumListAdapter(
+				this, this.kpPicker,
+				new AlbumListAdapter.OnAlbumListener() {
+					@Override
+					public void onAlbum(AlbumInfo albumInfo) {
+						if (kpAlbumLayer.getVisibility() == View.VISIBLE) {
+							toggleAlbumAndLayer();
+						}
+						kpAlbumName.setText(albumInfo.albumName);
+						kpPicker.selectedAlbumInfo = albumInfo;
+						observePictureList(albumInfo);
+					}
+				}
+		);
+		this.kpRecyclerViewAlbum.setAdapter(this.albumListAdapter);
+		if (this.kpPicker.selectedAlbumInfo == null) {
+			this.albumListAdapter.setSelectedPosition(0);
+		} else {
+			this.albumListAdapter.setSelectedAlbumInfo(this.kpPicker.selectedAlbumInfo);
+		}
+	}
+	
 	private void observePictureList(AlbumInfo albumInfo) {
 		this.kpRecyclerViewPicture.setLayoutManager(new GridLayoutManager(this, 3));
 		this.kpRecyclerViewPicture.getItemAnimator().setChangeDuration(0);
@@ -266,70 +318,139 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		this.kpRecyclerViewPicture.getItemAnimator().setRemoveDuration(0);
 		
 		this.pictureListAdapter = new PictureListAdapter(
-				this, albumInfo,
+				this,
+				this.kpPicker.pickCount == 1, albumInfo,
 				new PictureListAdapter.OnPictureListener() {
 					@Override
 					public void onCamera() {
 						showLoading();
 						
-						tempPictureInfo = kpPicker.createPictureInfo();
+						kpPicker.pictureInfo = kpPicker.createPictureInfo();
 						Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 						intent.putExtra(
 								MediaStore.EXTRA_OUTPUT,
-								kpPicker.getPictureContentUri(KPPicturePickerActivity.this, tempPictureInfo)
+								kpPicker.getPictureContentUri(KPPicturePickerActivity.this, kpPicker.pictureInfo)
 						);
-						startActivityForResult(intent, PICTURE);
+						startActivityForResult(intent, CAMERA);
 					}
 					
 					@Override
-					public boolean onPicture(PictureInfo pictureInfo) {
-						int index = pictureInfoList.indexOf(pictureInfo);
-						if (index != -1) {
+					public boolean onPick(PictureInfo pictureInfo) {
+						if (pictureInfo.selected) {
 							pictureInfo.selected = false;
-							pictureInfoList.remove(index);
+							kpPicker.pictureInfoList.remove(pictureInfo);
 						} else {
-							if (pictureInfoList.size() == kpPicker.pickCount) {
+							if (kpPicker.pictureInfoList.size() == kpPicker.pickCount) {
+								if (kpPicker.pickCount == 1) {
+									requestCompress();
+								}
 								return false;
 							}
 							pictureInfo.selected = true;
 							
-							// if (mPickCount == 1) {
-							// 	mPictureInfo = pictureInfo;
-							// 	if (kpPicker.isCrop) {
-							// 		showLoading();
-							// 		cropPicture();
-							// 	} else {
-							// 		mPictureInfoList.add(pictureInfo);
-							// 		mScaleTask.executeScale(mPictureInfoList);
-							// 	}
-							// 	return false;
-							// } else {
-							pictureInfoList.add(pictureInfo);
-							// }
+							if (kpPicker.pickCount == 1) {
+								if (kpPicker.pickEditable) {
+									kpPicker.pictureInfo = pictureInfo;
+									showLoading();
+									cropPicture();
+								} else {
+									kpPicker.pictureInfoList.add(pictureInfo);
+									requestCompress();
+								}
+								return false;
+							} else {
+								kpPicker.pictureInfoList.add(pictureInfo);
+							}
 						}
-						toggleToolbar();
+						alterPickCount();
 						return true;
 					}
 					
 					@Override
-					public void onPreview(int position) {
-						
+					public void onPreview(AlbumInfo albumInfo, int position) {
+						Intent intent = new Intent(KPPicturePickerActivity.this, KPPicturePreviewActivity.class);
+						intent.putExtra(KPPicker.PICKER, KPPicturePickerActivity.this.kpPicker);
+						intent.putExtra(KPPicturePreviewActivity.PREVIEW_PICTURE_INFO_LIST, albumInfo.pictureInfoList);
+						intent.putExtra(KPPicturePreviewActivity.PREVIEW_PICTURE_POSITION, position);
+						startActivityForResult(intent, PREVIEW);
 					}
 				}
 		);
+		PictureInfo pictureInfo = this.kpPicker.pictureInfo;
+		if (pictureInfo != null) {
+			int index = this.kpPicker.fullAlbumInfo.pictureInfoList.indexOf(pictureInfo);
+			if (index < 0) {
+				if (this.kpPicker.addPictureInfo(this.kpPicker.pictureInfo)) {
+					this.albumListAdapter.notifyDataSetChanged();
+					this.pictureListAdapter.notifyPickPicture(this.kpPicker.pictureInfo);
+				}
+			} else {
+				pictureInfo = this.kpPicker.fullAlbumInfo.pictureInfoList.get(index);
+				this.albumListAdapter.notifyDataSetChanged();
+				this.pictureListAdapter.notifyPickPicture(pictureInfo);
+			}
+		}
+		this.kpPicker.pictureInfo = null;
+		
 		this.kpRecyclerViewPicture.setAdapter(this.pictureListAdapter);
+		
+		if (this.isPreviewDone) {
+			requestCompress();
+		}
 	}
 	
-	private void requestScale() {
-		if (this.scaleTask != null) {
-			this.scaleTask.cancel(true);
+	/**
+	 * 裁剪处理
+	 */
+	private void cropPicture() {
+		PictureInfo cameraPictureInfo = this.kpPicker.pictureInfo;
+		this.kpPicker.pictureInfo = this.kpPicker.createPictureInfo();
+		
+		try {
+			Uri inputUri = this.kpPicker.getPictureContentUri(this, cameraPictureInfo);
+			Uri outputUri = this.kpPicker.getPictureContentUri(this, this.kpPicker.pictureInfo);
+			
+			Intent intent = new Intent("com.android.camera.action.CROP");
+			
+			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+			intent.setDataAndType(inputUri, "image/*");
+			intent.putExtra("crop", "true");
+			if (this.kpPicker.pickAspectX > 0 && this.kpPicker.pickAspectY > 0) {
+				intent.putExtra("aspectX", this.kpPicker.pickAspectX);
+				intent.putExtra("aspectY", this.kpPicker.pickAspectY);
+			}
+			intent.putExtra("scale", false);
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+				intent.setClipData(ClipData.newRawUri(MediaStore.EXTRA_OUTPUT, outputUri));
+			}
+			intent.putExtra("return-data", false);
+			intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+			intent.putExtra("noFaceDetection", false);
+			startActivityForResult(intent, CROP);
+		} catch (Exception ignored) {
+			ignored.printStackTrace();
+			this.kpPicker.pictureInfoList.add(cameraPictureInfo);
+			this.kpPicker.pictureInfo = null;
+			requestCompress();
+		}
+	}
+	
+	private void requestCompress() {
+		if (this.albumTask != null) {
+			this.albumTask.cancel(true);
+		}
+		if (this.compressTask != null) {
+			this.compressTask.cancel(true);
 		}
 		
 		showLoading();
-		this.scaleTask = new ScaleTask(
-				this.kpPicker, new ScaleTask.OnScaleListener() {
+		this.compressTask = new CompressTask(
+				this,
+				this.kpPicker.pickMaxWidth, this.kpPicker.pickMaxHeight,
+				new CompressTask.OnCompressListener() {
 					@Override
-					public void onScale(ArrayList<Uri> pictureUriList) {
+					public void onCompress(ArrayList<Uri> pictureUriList) {
 						hideLoading();
 						
 						Intent data = new Intent();
@@ -338,15 +459,13 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 						finish();
 					}
 				});
-		this.scaleTask.executeScale(this.pictureInfoList);
+		this.compressTask.executeCompress(this.kpPicker.pictureInfoList);
 	}
 	
 	void showLoading() {
-		
 	}
 	
 	void hideLoading() {
-		
 	}
 	
 	@Override
@@ -360,25 +479,91 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == PICTURE) {
+		if (requestCode == CAMERA) {
+			if (this.pictureListAdapter == null) {
+				return;
+			}
+			PictureInfo pictureInfo = this.kpPicker.pictureInfo;
+			this.kpPicker.pictureInfo = null;
 			if (resultCode == RESULT_OK) {
 				// 广播添加至相册
-				Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-				intent.setData(this.tempPictureInfo.pictureUri);
-				sendBroadcast(intent);
+				// Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+				// intent.setData(this.kpPicker.pictureInfo.pictureUri);
+				// sendBroadcast(intent);
 				
-				if (KPPicker.addPictureInfo(
-						this.albumListAdapter.getAlbumInfoList(),
-						this.tempPictureInfo)) {
+				if (this.kpPicker.addPictureInfo(pictureInfo)) {
 					this.albumListAdapter.notifyDataSetChanged();
-					this.pictureListAdapter.notifyPickPicture(this.tempPictureInfo);
-				} else {
-					this.kpPicker.removePictureInfo(this.tempPictureInfo);
+					this.pictureListAdapter.notifyPickPicture(pictureInfo);
+					hideLoading();
+					return;
 				}
-			} else {
-				this.kpPicker.removePictureInfo(this.tempPictureInfo);
 			}
+			pictureInfo.delete();
 			hideLoading();
+			return;
+		}
+		if (requestCode == CROP) {
+			if (this.pictureListAdapter == null) {
+				return;
+			}
+			PictureInfo pictureInfo = this.kpPicker.pictureInfo;
+			this.kpPicker.pictureInfo = null;
+			if (resultCode == RESULT_OK) {
+				pictureInfo.obtainPictureSize();
+				if (pictureInfo.isAvailable()) {
+					this.kpPicker.pictureInfoList.add(pictureInfo);
+					if (this.kpPicker.addPictureInfo(pictureInfo)) {
+						this.albumListAdapter.notifyDataSetChanged();
+						this.pictureListAdapter.notifyPickPicture(pictureInfo);
+						return;
+					}
+				}
+			}
+			pictureInfo.delete();
+			hideLoading();
+			return;
+		}
+		if (requestCode == PREVIEW) {
+			if (resultCode == RESULT_OK) {
+				this.isPreviewDone = data.getBooleanExtra(KPPicturePreviewActivity.PREVIEW_DONE, false);
+				if (this.pictureListAdapter == null) {
+					KPPicker kpPreviewPicker = data.getParcelableExtra(KPPicker.PICKER);
+					this.kpPicker.pictureInfoList = kpPreviewPicker.pictureInfoList;
+					return;
+				}
+				
+				ArrayList<PictureInfo> resultInfoList = new ArrayList<>();
+				
+				ArrayList<PictureInfo> selectedInfoList;
+				ArrayList<PictureInfo> pictureInfoList;
+				ArrayList<PictureInfo> previewSelectedInfoList;
+				
+				selectedInfoList = this.kpPicker.pictureInfoList;
+				KPPicker kpPreviewPicker = data.getParcelableExtra(KPPicker.PICKER);
+				previewSelectedInfoList = kpPreviewPicker.pictureInfoList;
+				if (data.getBooleanExtra(KPPicturePreviewActivity.PREVIEW_PREVIEW, false)) {
+					pictureInfoList = this.kpPicker.pictureInfoList;
+				} else {
+					pictureInfoList = this.pictureListAdapter.getAlbumInfo().pictureInfoList;
+				}
+				
+				for (PictureInfo pictureInfo : previewSelectedInfoList) {
+					int index = pictureInfoList.indexOf(pictureInfo);
+					PictureInfo selectedPictureInfo = pictureInfoList.get(index);
+					selectedPictureInfo.selected = true;
+					resultInfoList.add(selectedPictureInfo);
+				}
+				for (PictureInfo pictureInfo : selectedInfoList) {
+					pictureInfo.selected = resultInfoList.contains(pictureInfo);
+				}
+				this.kpPicker.pictureInfoList = resultInfoList;
+				alterPickCount();
+				pictureListAdapter.notifyDataSetChanged();
+				
+				if (this.isPreviewDone) {
+					requestCompress();
+				}
+			}
 			return;
 		}
 		super.onActivityResult(requestCode, resultCode, data);
@@ -392,8 +577,8 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		if (this.albumTask != null) {
 			this.albumTask.cancel(true);
 		}
-		if (this.scaleTask != null) {
-			this.scaleTask.cancel(true);
+		if (this.compressTask != null) {
+			this.compressTask.cancel(true);
 		}
 	}
 	

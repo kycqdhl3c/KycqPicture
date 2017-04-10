@@ -1,22 +1,24 @@
 package com.kycq.library.picture.picker;
 
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.File;
 import java.util.Locale;
 
 class PictureInfo implements Parcelable {
 	/** 图片地址 */
-	public Uri pictureUri;
+	Uri pictureUri;
 	/** 图片路径 */
-	public String picturePath;
+	String picturePath;
 	/** 图片宽度 */
-	public int pictureWidth;
+	int pictureWidth;
 	/** 图片高度 */
-	public int pictureHeight;
+	int pictureHeight;
 	/** 图片选择状态 */
-	public boolean selected;
+	boolean selected;
 	
 	PictureInfo() {
 	}
@@ -29,6 +31,22 @@ class PictureInfo implements Parcelable {
 		selected = in.readByte() != 0;
 	}
 	
+	void obtainPictureSize() {
+		if (pictureWidth > 0 && pictureHeight > 0) {
+			return;
+		}
+		
+		if (!new File(picturePath).exists()) {
+			return;
+		}
+		
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(this.picturePath, options);
+		this.pictureWidth = options.outWidth;
+		this.pictureHeight = options.outHeight;
+	}
+	
 	/**
 	 * 图片是否可用
 	 *
@@ -36,6 +54,11 @@ class PictureInfo implements Parcelable {
 	 */
 	boolean isAvailable() {
 		return pictureWidth > 0 && pictureHeight > 0;
+	}
+	
+	void delete() {
+		// noinspection ResultOfMethodCallIgnored
+		new File(pictureUri.getPath()).delete();
 	}
 	
 	@Override

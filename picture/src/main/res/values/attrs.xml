@@ -3,12 +3,14 @@
 	<declare-styleable name="PictureLayout">
 		<attr name="picture_maxCount" format="integer"/>
 		<attr name="picture_rowCount" format="integer"/>
+		<attr name="picture_pictureRatio" format="float"/>
+		<attr name="picture_pictureRound" format="dimension"/>
 		<attr name="picture_horizontalPadding" format="dimension"/>
 		<attr name="picture_verticalPadding" format="dimension"/>
-		<attr name="picture_pictureRatio" format="float"/>
-		<attr name="picture_pictureUpload" format="boolean"/>
-		<attr name="picture_uploadPicture" format="reference"/>
-		<attr name="picture_uploadBackground" format="reference"/>
-		<attr name="picture_pictureView" format="reference"/>
+		<attr name="picture_editDrawable" format="reference"/>
+		<attr name="picture_supportInsert" format="boolean"/>
+		<attr name="picture_insertDrawable" format="reference"/>
+		<attr name="picture_insertBackground" format="reference"/>
+		<attr name="picture_pictureViewLayout" format="reference"/>
 	</declare-styleable>
 </resources>

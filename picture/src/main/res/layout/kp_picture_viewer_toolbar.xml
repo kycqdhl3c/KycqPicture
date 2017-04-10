@@ -18,15 +18,15 @@
 		android:layout_height="@dimen/kpActionBarSize"
 		android:layout_weight="1.0"
 		android:gravity="center_vertical"
-		android:text="@string/kp_select_picture"
+		android:text="@string/kp_view"
 		android:textColor="@android:color/white"
 		android:textSize="18sp"/>
 	
 	<ImageView
-		android:id="@id/kpDone"
+		android:id="@id/kpEdit"
 		android:layout_width="@dimen/kpActionBarSize"
 		android:layout_height="@dimen/kpActionBarSize"
 		android:background="?android:attr/selectableItemBackground"
 		android:scaleType="centerInside"
-		android:src="@drawable/kp_ic_done"/>
+		android:src="@drawable/kp_ic_remove"/>
 </LinearLayout>

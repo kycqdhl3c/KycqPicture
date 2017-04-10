@@ -18,15 +18,23 @@ import com.kycq.library.picture.R;
 class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.PictureHolder> {
 	private LayoutInflater inflater;
 	
+	private boolean isSingle;
 	private AlbumInfo albumInfo;
+	
 	private OnPictureListener onPictureListener;
 	
 	PictureListAdapter(Context context,
+	                   boolean isSingle,
 	                   AlbumInfo albumInfo,
 	                   OnPictureListener onPictureListener) {
 		this.inflater = LayoutInflater.from(context);
+		this.isSingle = isSingle;
 		this.albumInfo = albumInfo;
 		this.onPictureListener = onPictureListener;
+	}
+	
+	public AlbumInfo getAlbumInfo() {
+		return this.albumInfo;
 	}
 	
 	/**
@@ -35,7 +43,8 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 	 * @param pictureInfo 图片信息
 	 */
 	void notifyPickPicture(PictureInfo pictureInfo) {
-		if (this.onPictureListener.onPicture(pictureInfo)) {
+		if (this.onPictureListener.onPick(pictureInfo)
+				&& this.albumInfo.pictureInfoList.contains(pictureInfo)) {
 			notifyItemInserted(1);
 		}
 	}
@@ -52,7 +61,7 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 			return;
 		}
 		
-		if (onPictureListener.onPicture(pictureInfo)) {
+		if (onPictureListener.onPick(pictureInfo)) {
 			notifyItemChanged(adapterPosition);
 		}
 	}
@@ -66,11 +75,14 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 		if (this.albumInfo.isFullAlbum()) {
 			if (adapterPosition == 0) {
 				onPictureListener.onCamera();
-			} else {
-				onPictureListener.onPreview(adapterPosition - 1);
+				return;
 			}
+			adapterPosition--;
+		}
+		if (isSingle) {
+			onPictureListener.onPick(this.albumInfo.pictureInfoList.get(adapterPosition));
 		} else {
-			onPictureListener.onPreview(adapterPosition);
+			onPictureListener.onPreview(this.albumInfo, adapterPosition);
 		}
 	}
 	
@@ -137,6 +149,8 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 							R.drawable.kp_ic_camera,
 							ScalingUtils.ScaleType.CENTER_INSIDE
 					);
+			this.kpPictureView.setController(null);
+			
 			this.kpLayer.setVisibility(View.GONE);
 			this.kpSelected.setVisibility(View.GONE);
 		}
@@ -156,7 +170,7 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 					);
 			
 			this.kpLayer.setVisibility(View.VISIBLE);
-			this.kpSelected.setVisibility(View.VISIBLE);
+			this.kpSelected.setVisibility(isSingle ? View.GONE : View.VISIBLE);
 			if (pictureInfo.selected) {
 				this.kpLayer.setBackgroundResource(R.color.kpPictureSelectedColor);
 				this.kpSelected.setImageResource(R.drawable.kp_ic_picture_check_selected);
@@ -194,13 +208,14 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 		 * @param pictureInfo 图片信息
 		 * @return true:有效操作 false:无效操作
 		 */
-		boolean onPicture(PictureInfo pictureInfo);
+		boolean onPick(PictureInfo pictureInfo);
 		
 		/**
 		 * 预览
 		 *
-		 * @param position 图片列表位置
+		 * @param albumInfo 相册信息
+		 * @param position  图片列表位置
 		 */
-		void onPreview(int position);
+		void onPreview(AlbumInfo albumInfo, int position);
 	}
 }

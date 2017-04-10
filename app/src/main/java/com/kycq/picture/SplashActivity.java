@@ -1,14 +1,22 @@
 package com.kycq.picture;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.kycq.library.picture.picker.KPPicker;
+import com.kycq.library.picture.viewer.KPViewer;
 import com.kycq.library.picture.widget.PictureLayout;
 import com.kycq.picture.databinding.ActivitySplashBinding;
+import com.kycq.picture.databinding.DialogSettingsBinding;
 
 public class SplashActivity extends AppCompatActivity {
 	/** 选取图片 */
@@ -18,209 +26,33 @@ public class SplashActivity extends AppCompatActivity {
 	
 	private ActivitySplashBinding mDataBinding;
 	
+	private boolean isCrop = true;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
 		
-		// 	observePickerCount();
-		// 	observeCrop();
-		// 	observeAspectX();
-		// 	observeAspectY();
-		// 	observeMaxWidth();
-		// 	observeMaxHeight();
+		observeViewer();
 		observePicker();
-		
-		// 	mDataBinding.editPickerCount.setText("1");
-		// 	mDataBinding.checkCrop.setChecked(true);
-		// 	mDataBinding.setIsCrop(true);
-		// 	mDataBinding.editAspectX.setText("0");
-		// 	mDataBinding.editAspectY.setText("0");
-		// 	mDataBinding.editMaxWidth.setText("0");
-		// 	mDataBinding.editMaxHeight.setText("0");
 	}
-	//
-	// /**
-	//  * 输出图片数量
-	//  */
-	// private void observePickerCount() {
-	// 	mDataBinding.editPickerCount.addTextChangedListener(new TextWatcher() {
-	// 		@Override
-	// 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-	// 		}
-	//
-	// 		@Override
-	// 		public void onTextChanged(CharSequence s, int start, int before, int count) {
-	// 			try {
-	// 				if (s.length() == 0) {
-	// 					return;
-	// 				}
-	//
-	// 				int pickerCount = Integer.parseInt(s.toString());
-	// 				if (pickerCount <= 0) {
-	// 					mDataBinding.editPickerCount.setText("1");
-	// 				} else if (pickerCount > 9) {
-	// 					mDataBinding.editPickerCount.setText("9");
-	// 				} else if (pickerCount == 1) {
-	// 					mDataBinding.checkCrop.setEnabled(true);
-	// 					mDataBinding.setIsCrop(mDataBinding.checkCrop.isChecked());
-	// 				} else {
-	// 					mDataBinding.checkCrop.setEnabled(false);
-	// 					mDataBinding.setIsCrop(false);
-	// 				}
-	// 			} catch (NumberFormatException ignored) {
-	// 				mDataBinding.editPickerCount.setText("1");
-	// 			}
-	// 			mDataBinding.editPickerCount.setSelection(mDataBinding.editPickerCount.length());
-	// 		}
-	//
-	// 		@Override
-	// 		public void afterTextChanged(Editable editable) {
-	//
-	// 		}
-	// 	});
-	// }
-	//
-	// /**
-	//  * 裁剪
-	//  */
-	// private void observeCrop() {
-	// 	mDataBinding.checkCrop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-	// 		@Override
-	// 		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-	// 			mDataBinding.setIsCrop(isChecked);
-	// 		}
-	// 	});
-	// }
-	//
-	// /**
-	//  * 裁剪X轴比例
-	//  */
-	// private void observeAspectX() {
-	// 	mDataBinding.editAspectX.addTextChangedListener(new TextWatcher() {
-	// 		@Override
-	// 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-	// 		}
-	//
-	// 		@Override
-	// 		public void onTextChanged(CharSequence s, int start, int before, int count) {
-	// 			try {
-	// 				if (s.length() == 0) {
-	// 					return;
-	// 				}
-	//
-	// 				int aspectX = Integer.parseInt(s.toString());
-	// 				if (aspectX < 0) {
-	// 					mDataBinding.editAspectX.setText("0");
-	// 				}
-	// 			} catch (NumberFormatException ignored) {
-	// 				mDataBinding.editAspectX.setText("0");
-	// 			}
-	// 			mDataBinding.editAspectX.setSelection(mDataBinding.editAspectX.length());
-	// 		}
-	//
-	// 		@Override
-	// 		public void afterTextChanged(Editable editable) {
-	// 		}
-	// 	});
-	// }
-	//
-	// /**
-	//  * 裁剪Y轴比例
-	//  */
-	// private void observeAspectY() {
-	// 	mDataBinding.editAspectY.addTextChangedListener(new TextWatcher() {
-	// 		@Override
-	// 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-	// 		}
-	//
-	// 		@Override
-	// 		public void onTextChanged(CharSequence s, int start, int before, int count) {
-	// 			try {
-	// 				if (s.length() == 0) {
-	// 					return;
-	// 				}
-	//
-	// 				int aspectY = Integer.parseInt(s.toString());
-	// 				if (aspectY < 0) {
-	// 					mDataBinding.editAspectY.setText("0");
-	// 				}
-	// 			} catch (NumberFormatException ignored) {
-	// 				mDataBinding.editAspectY.setText("0");
-	// 			}
-	// 			mDataBinding.editAspectY.setSelection(mDataBinding.editAspectY.length());
-	// 		}
-	//
-	// 		@Override
-	// 		public void afterTextChanged(Editable editable) {
-	// 		}
-	// 	});
-	// }
-	//
-	// /**
-	//  * 最大宽度
-	//  */
-	// private void observeMaxWidth() {
-	// 	mDataBinding.editMaxWidth.addTextChangedListener(new TextWatcher() {
-	// 		@Override
-	// 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-	// 		}
-	//
-	// 		@Override
-	// 		public void onTextChanged(CharSequence s, int start, int before, int count) {
-	// 			try {
-	// 				if (s.length() == 0) {
-	// 					return;
-	// 				}
-	//
-	// 				int maxWidth = Integer.parseInt(s.toString());
-	// 				if (maxWidth < 0) {
-	// 					mDataBinding.editMaxWidth.setText("0");
-	// 				}
-	// 			} catch (NumberFormatException ignored) {
-	// 				mDataBinding.editMaxWidth.setText("0");
-	// 			}
-	// 			mDataBinding.editMaxWidth.setSelection(mDataBinding.editMaxWidth.length());
-	// 		}
-	//
-	// 		@Override
-	// 		public void afterTextChanged(Editable editable) {
-	// 		}
-	// 	});
-	// }
-	//
-	// /**
-	//  * 最大高度
-	//  */
-	// private void observeMaxHeight() {
-	// 	mDataBinding.editMaxHeight.addTextChangedListener(new TextWatcher() {
-	// 		@Override
-	// 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-	// 		}
-	//
-	// 		@Override
-	// 		public void onTextChanged(CharSequence s, int start, int before, int count) {
-	// 			try {
-	// 				if (s.length() == 0) {
-	// 					return;
-	// 				}
-	//
-	// 				int maxHeight = Integer.parseInt(s.toString());
-	// 				if (maxHeight < 0) {
-	// 					mDataBinding.editMaxHeight.setText("0");
-	// 				}
-	// 			} catch (NumberFormatException ignored) {
-	// 				mDataBinding.editMaxHeight.setText("0");
-	// 			}
-	// 			mDataBinding.editMaxHeight.setSelection(mDataBinding.editMaxHeight.length());
-	// 		}
-	//
-	// 		@Override
-	// 		public void afterTextChanged(Editable editable) {
-	// 		}
-	// 	});
-	// }
-	//
+	
+	private void observeViewer() {
+		mDataBinding.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int state) {
+			}
+			
+			@Override
+			public void onPageSelected(int position) {
+				mDataBinding.pictureLayout.setSelectedPosition(position);
+			}
+		});
+	}
 	
 	/**
 	 * 选取图片
@@ -228,39 +60,93 @@ public class SplashActivity extends AppCompatActivity {
 	private void observePicker() {
 		mDataBinding.pictureLayout.setOnPictureListener(new PictureLayout.OnPictureListener() {
 			@Override
-			public void onUpload() {
-				// int pickerCount = Integer.parseInt(mDataBinding.editPickerCount.getText().toString().trim());
-				// boolean isCrop = mDataBinding.checkCrop.isEnabled() && mDataBinding.checkCrop.isChecked();
-				// int aspectX = Integer.parseInt(mDataBinding.editAspectX.getText().toString().trim());
-				// int aspectY = Integer.parseInt(mDataBinding.editAspectY.getText().toString().trim());
-				// int maxWidth = Integer.parseInt(mDataBinding.editMaxWidth.getText().toString().trim());
-				// int maxHeight = Integer.parseInt(mDataBinding.editMaxHeight.getText().toString().trim());
-				//
-				// Intent intent = new Intent(SplashActivity.this, PicturePickerActivity.class);
-				// intent.putExtra(Picker.PICKER_COUNT, pickerCount);
-				// intent.putExtra(Picker.PICKER_CROP, isCrop);
-				// intent.putExtra(Picker.PICKER_ASPECT_X, aspectX);
-				// intent.putExtra(Picker.PICKER_ASPECT_Y, aspectY);
-				// intent.putExtra(Picker.PICKER_MAX_WIDTH, maxWidth);
-				// intent.putExtra(Picker.PICKER_MAX_HEIGHT, maxHeight);
-				// startActivityForResult(intent, PICKER);
-				
-				
+			public void onInsert() {
 				new KPPicker.Builder()
-						.pickCount(5)
+						.pickCount(mDataBinding.pictureLayout.getMaxCount() - mDataBinding.pictureLayout.size())
+						.pickMaxSize(1080, 0)
+						.pickEditable(isCrop)
 						.pick(SplashActivity.this, PICKER);
 			}
 			
 			@Override
-			public void onView(int position, Uri pictureUri) {
-				// ArrayList<Uri> pictureList = mDataBinding.pictureLayout.getPictureList();
-				// Intent intent = new Intent(SplashActivity.this, PictureViewerActivity.class);
-				// intent.putExtra(Viewer.VIEWER_LIST, pictureList);
-				// intent.putExtra(Viewer.VIEWER_POSITION, position);
-				// intent.putExtra(Viewer.VIEWER_EDIT, true);
-				// startActivityForResult(intent, VIEWER);
+			public void onEdit(int position, Uri pictureUri) {
+				mDataBinding.pictureLayout.removePictureUri(position);
+				mDataBinding.viewPager.setAdapter(new PicturePagerAdapter(
+						SplashActivity.this,
+						mDataBinding.pictureLayout.getPictureList(),
+						viewClickListener));
+				mDataBinding.viewPager.setCurrentItem(mDataBinding.pictureLayout.getSelectedPosition());
+			}
+			
+			@Override
+			public void onSelect(int position, Uri pictureUri) {
+				mDataBinding.viewPager.setCurrentItem(position);
 			}
 		});
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add("设置")
+				.setIcon(R.drawable.ic_settings)
+				.setVisible(true)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		final DialogSettingsBinding dataBinding = DataBindingUtil.inflate(
+				getLayoutInflater(),
+				R.layout.dialog_settings,
+				null, false
+		);
+		dataBinding.editMaxCount.setText(String.valueOf(mDataBinding.pictureLayout.getMaxCount()));
+		dataBinding.editRowCount.setText(String.valueOf(mDataBinding.pictureLayout.getRowCount()));
+		dataBinding.editPictureRatio.setText(String.valueOf(mDataBinding.pictureLayout.getPictureRatio()));
+		dataBinding.editPictureRound.setText(String.valueOf(mDataBinding.pictureLayout.getPictureRound()));
+		dataBinding.cbInsert.setChecked(mDataBinding.pictureLayout.isSupportInsert());
+		new AlertDialog.Builder(this)
+				.setTitle("设置")
+				.setView(dataBinding.getRoot())
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						int maxCount = 5;
+						int rowCount = 0;
+						float pictureRatio = 0F;
+						float pictureRound = 0F;
+						
+						String maxCountStr = dataBinding.editMaxCount.getText().toString().trim();
+						if (maxCountStr.length() > 0) {
+							maxCount = Integer.parseInt(maxCountStr);
+						}
+						
+						String rowCountStr = dataBinding.editRowCount.getText().toString().trim();
+						if (rowCountStr.length() > 0) {
+							rowCount = Integer.parseInt(rowCountStr);
+						}
+						
+						String pictureRatioStr = dataBinding.editPictureRatio.getText().toString().trim();
+						if (pictureRatioStr.length() > 0) {
+							pictureRatio = Float.parseFloat(pictureRatioStr);
+						}
+						
+						String pictureRoundStr = dataBinding.editPictureRound.getText().toString().trim();
+						if (pictureRoundStr.length() > 0) {
+							pictureRound = Float.parseFloat(pictureRoundStr);
+						}
+						
+						mDataBinding.pictureLayout.setMaxCount(maxCount);
+						mDataBinding.pictureLayout.setRowCount(rowCount);
+						mDataBinding.pictureLayout.setPictureRatio(pictureRatio);
+						mDataBinding.pictureLayout.setPictureRound(pictureRound);
+						mDataBinding.pictureLayout.setSupportInsert(dataBinding.cbInsert.isChecked());
+						isCrop = dataBinding.cbCrop.isChecked();
+					}
+				})
+				.show();
+		return true;
 	}
 	
 	@Override
@@ -268,15 +154,36 @@ public class SplashActivity extends AppCompatActivity {
 		if (requestCode == PICKER) {
 			if (resultCode == RESULT_OK) {
 				mDataBinding.pictureLayout.addPictureUri(KPPicker.pickPictureUriList(data));
+				mDataBinding.viewPager.setAdapter(new PicturePagerAdapter(
+						this,
+						mDataBinding.pictureLayout.getPictureList(),
+						viewClickListener));
+				mDataBinding.pictureLayout.setSelectedPosition(mDataBinding.viewPager.getCurrentItem());
 			}
 			return;
 		}
 		if (requestCode == VIEWER) {
 			if (resultCode == RESULT_OK) {
-				mDataBinding.pictureLayout.setPictureList(KPPicker.pickPictureUriList(data));
+				mDataBinding.pictureLayout.setPictureList(KPViewer.viewPictureUriList(data));
+				mDataBinding.viewPager.setAdapter(new PicturePagerAdapter(
+						this,
+						mDataBinding.pictureLayout.getPictureList(),
+						viewClickListener));
+				mDataBinding.pictureLayout.setSelectedPosition(mDataBinding.viewPager.getCurrentItem());
 			}
 			return;
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
+	
+	private View.OnClickListener viewClickListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			new KPViewer.Builder()
+					.viewPictureList(mDataBinding.pictureLayout.getPictureList())
+					.viewPosition(mDataBinding.pictureLayout.getSelectedPosition())
+					.viewEditable(true)
+					.view(SplashActivity.this, VIEWER);
+		}
+	};
 }

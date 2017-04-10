@@ -15,33 +15,70 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.kycq.library.picture.R;
 
-import java.util.ArrayList;
-
 class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder> {
 	private LayoutInflater inflater;
 	
-	private ArrayList<AlbumInfo> albumInfoList;
+	private KPPicker kpPicker;
 	private OnAlbumListener onAlbumListener;
 	
 	private int selectedPosition = 0;
 	
 	AlbumListAdapter(Context context,
-	                 ArrayList<AlbumInfo> albumInfoList,
+	                 KPPicker kpPicker,
 	                 OnAlbumListener onAlbumListener) {
 		this.inflater = LayoutInflater.from(context);
-		this.albumInfoList = albumInfoList;
+		this.kpPicker = kpPicker;
 		this.onAlbumListener = onAlbumListener;
-		
-		onAlbumListener.onAlbum(albumInfoList.get(0));
 	}
 	
-	ArrayList<AlbumInfo> getAlbumInfoList() {
-		return this.albumInfoList;
+	void setSelectedPosition(int selectedPosition) {
+		int oldSelectedPosition = this.selectedPosition;
+		this.selectedPosition = selectedPosition;
+		notifyItemChanged(oldSelectedPosition);
+		notifyItemChanged(selectedPosition);
+		
+		onAlbumListener.onAlbum(getItem(selectedPosition));
+	}
+	
+	void setSelectedAlbumInfo(AlbumInfo albumInfo) {
+		if (albumInfo.equals(this.kpPicker.fullAlbumInfo)) {
+			setSelectedPosition(0);
+		} else if (albumInfo.equals(this.kpPicker.cacheAlbumInfo)
+				&& this.kpPicker.cacheAlbumInfo.size() > 0) {
+			setSelectedPosition(1);
+		} else {
+			int index = this.kpPicker.albumInfoList.indexOf(albumInfo);
+			if (index < 0) {
+				setSelectedPosition(0);
+			} else if (this.kpPicker.cacheAlbumInfo.size() > 0) {
+				setSelectedPosition(index + 2);
+			} else {
+				setSelectedPosition(index + 1);
+			}
+		}
+	}
+	
+	private AlbumInfo getItem(int position) {
+		if (position == 0) {
+			return this.kpPicker.fullAlbumInfo;
+		}
+		position--;
+		boolean hasCache = this.kpPicker.cacheAlbumInfo.size() > 0;
+		if (position == 0 && hasCache) {
+			return this.kpPicker.cacheAlbumInfo;
+		}
+		if (hasCache) {
+			position--;
+		}
+		return this.kpPicker.albumInfoList.get(position);
 	}
 	
 	@Override
 	public int getItemCount() {
-		return this.albumInfoList.size();
+		if (this.kpPicker.cacheAlbumInfo.size() > 0) {
+			return this.kpPicker.albumInfoList.size() + 2;
+		}
+		return this.kpPicker.albumInfoList.size() + 1;
 	}
 	
 	@Override
@@ -51,7 +88,7 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 	
 	@Override
 	public void onBindViewHolder(AlbumHolder holder, int position) {
-		holder.setAlbumInfo(this.albumInfoList.get(position));
+		holder.setAlbumInfo(getItem(position));
 	}
 	
 	class AlbumHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -112,13 +149,7 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 		
 		@Override
 		public void onClick(View v) {
-			int position = getAdapterPosition();
-			int oldSelectedPosition = selectedPosition;
-			selectedPosition = position;
-			notifyItemChanged(oldSelectedPosition);
-			notifyItemChanged(selectedPosition);
-			
-			onAlbumListener.onAlbum(albumInfoList.get(selectedPosition));
+			setSelectedPosition(getAdapterPosition());
 		}
 	}
 	

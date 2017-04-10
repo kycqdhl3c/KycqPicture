@@ -3,7 +3,6 @@ package com.kycq.library.picture.picker;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -15,9 +14,7 @@ import android.support.v4.content.FileProvider;
 import com.kycq.library.picture.R;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class KPPicker implements Parcelable {
 	/** 选择参数 */
@@ -25,27 +22,71 @@ public class KPPicker implements Parcelable {
 	/** 输出图片列表 */
 	static final String PICKER_LIST = "pickerList";
 	
-	/** 日期格式 */
-	private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
-	
-	String allPictureAlbumName;
+	String fullAlbumName;
+	String cacheAlbumPath;
 	int pickCount;
 	int pickAspectX;
 	int pickAspectY;
 	int pickMaxWidth;
 	int pickMaxHeight;
+	boolean pickEditable;
+	
+	AlbumInfo fullAlbumInfo;
+	AlbumInfo cacheAlbumInfo;
+	ArrayList<AlbumInfo> albumInfoList;
+	AlbumInfo selectedAlbumInfo;
+	
+	ArrayList<PictureInfo> pictureInfoList = new ArrayList<>();
+	PictureInfo pictureInfo;
 	
 	private KPPicker() {
 	}
 	
 	private KPPicker(Parcel in) {
-		allPictureAlbumName = in.readString();
+		fullAlbumName = in.readString();
+		cacheAlbumPath = in.readString();
 		pickCount = in.readInt();
 		pickAspectX = in.readInt();
 		pickAspectY = in.readInt();
 		pickMaxWidth = in.readInt();
 		pickMaxHeight = in.readInt();
+		pickEditable = in.readByte() != 0;
+		selectedAlbumInfo = in.readParcelable(AlbumInfo.class.getClassLoader());
+		pictureInfoList = in.createTypedArrayList(PictureInfo.CREATOR);
+		pictureInfo = in.readParcelable(PictureInfo.class.getClassLoader());
 	}
+	
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(fullAlbumName);
+		dest.writeString(cacheAlbumPath);
+		dest.writeInt(pickCount);
+		dest.writeInt(pickAspectX);
+		dest.writeInt(pickAspectY);
+		dest.writeInt(pickMaxWidth);
+		dest.writeInt(pickMaxHeight);
+		dest.writeByte((byte) (pickEditable ? 1 : 0));
+		dest.writeParcelable(selectedAlbumInfo, flags);
+		dest.writeTypedList(pictureInfoList);
+		dest.writeParcelable(pictureInfo, flags);
+	}
+	
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+	
+	public static final Creator<KPPicker> CREATOR = new Creator<KPPicker>() {
+		@Override
+		public KPPicker createFromParcel(Parcel in) {
+			return new KPPicker(in);
+		}
+		
+		@Override
+		public KPPicker[] newArray(int size) {
+			return new KPPicker[size];
+		}
+	};
 	
 	/**
 	 * 创建相机照片信息
@@ -53,22 +94,10 @@ public class KPPicker implements Parcelable {
 	 * @return 图片信息
 	 */
 	PictureInfo createPictureInfo() {
-		// 相机照片目录
-		File cameraDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-		if (!cameraDirectory.exists()) {
-			// noinspection ResultOfMethodCallIgnored
-			cameraDirectory.mkdir();
-		}
-		
 		PictureInfo pictureInfo = new PictureInfo();
-		pictureInfo.picturePath = cameraDirectory + "/IMG_" + DATE_FORMAT.format(System.currentTimeMillis()) + ".jpg";
+		pictureInfo.picturePath = this.cacheAlbumInfo.albumPath + "/IMG_" + System.currentTimeMillis() + ".jpg";
 		pictureInfo.pictureUri = Uri.fromFile(new File(pictureInfo.picturePath));
 		return pictureInfo;
-	}
-	
-	boolean removePictureInfo(PictureInfo pictureInfo) {
-		File pictureFile = new File(pictureInfo.pictureUri.getPath());
-		return pictureFile.delete();
 	}
 	
 	/**
@@ -92,82 +121,18 @@ public class KPPicker implements Parcelable {
 	/**
 	 * 添加图片信息至相册中
 	 *
-	 * @param albumInfoList 相册信息列表
-	 * @param pictureInfo   图片信息
+	 * @param pictureInfo 图片信息
 	 * @return true添加成功
 	 */
-	static boolean addPictureInfo(ArrayList<AlbumInfo> albumInfoList, PictureInfo pictureInfo) {
-		if (albumInfoList == null) {
-			return false;
-		}
-		
-		obtainPictureSize(pictureInfo);
+	boolean addPictureInfo(PictureInfo pictureInfo) {
+		pictureInfo.obtainPictureSize();
 		if (!pictureInfo.isAvailable()) {
 			return false;
 		}
-		
-		String albumPath = new File(pictureInfo.picturePath).getParentFile().getAbsolutePath();
-		for (AlbumInfo albumInfo : albumInfoList) {
-			if (albumInfo.isFullAlbum()) {
-				albumInfo.pictureInfoList.add(0, pictureInfo);
-			} else if (albumInfo.albumPath.equals(albumPath)) {
-				albumInfo.pictureInfoList.add(0, pictureInfo);
-				return true;
-			}
-		}
-		
-		AlbumInfo albumInfo = AlbumInfo.buildByPath(albumPath);
-		albumInfo.pictureInfoList.add(0, pictureInfo);
-		albumInfoList.add(albumInfo);
-		
+		this.fullAlbumInfo.pictureInfoList.add(0, pictureInfo);
+		this.cacheAlbumInfo.pictureInfoList.add(0, pictureInfo);
 		return true;
 	}
-	
-	/**
-	 * 获取图片大小信息
-	 */
-	static void obtainPictureSize(PictureInfo pictureInfo) {
-		if (pictureInfo.pictureWidth > 0 && pictureInfo.pictureHeight > 0) {
-			return;
-		}
-		
-		if (!new File(pictureInfo.picturePath).exists()) {
-			return;
-		}
-		
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		BitmapFactory.decodeFile(pictureInfo.picturePath, options);
-		pictureInfo.pictureWidth = options.outWidth;
-		pictureInfo.pictureHeight = options.outHeight;
-	}
-	
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-	
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(allPictureAlbumName);
-		dest.writeInt(pickCount);
-		dest.writeInt(pickAspectX);
-		dest.writeInt(pickAspectY);
-		dest.writeInt(pickMaxWidth);
-		dest.writeInt(pickMaxHeight);
-	}
-	
-	public static final Creator<KPPicker> CREATOR = new Creator<KPPicker>() {
-		@Override
-		public KPPicker createFromParcel(Parcel in) {
-			return new KPPicker(in);
-		}
-		
-		@Override
-		public KPPicker[] newArray(int size) {
-			return new KPPicker[size];
-		}
-	};
 	
 	public static Uri pickPictureUri(Intent data) {
 		return pickPictureUri(data, 0);
@@ -186,11 +151,24 @@ public class KPPicker implements Parcelable {
 	}
 	
 	public static class Builder {
+		String fullAlbumName;
+		String cacheAlbumPath;
 		int pickCount;
 		int pickAspectX;
 		int pickAspectY;
 		int pickMaxWidth;
 		int pickMaxHeight;
+		boolean pickEditable;
+		
+		public Builder pickFullAlbumName(String fullAlbumName) {
+			this.fullAlbumName = fullAlbumName;
+			return this;
+		}
+		
+		public Builder pickCacheAlbumPath(String cacheAlbumPath) {
+			this.cacheAlbumPath = cacheAlbumPath;
+			return this;
+		}
 		
 		public Builder pickCount(int pickCount) {
 			this.pickCount = pickCount;
@@ -209,6 +187,11 @@ public class KPPicker implements Parcelable {
 			return this;
 		}
 		
+		public Builder pickEditable(boolean pickEditable) {
+			this.pickEditable = pickEditable;
+			return this;
+		}
+		
 		public void pick(Activity activity, int requestCode) {
 			Intent intent = new Intent(activity, KPPicturePickerActivity.class);
 			intent.putExtra(PICKER, buildPicker(activity));
@@ -222,14 +205,43 @@ public class KPPicker implements Parcelable {
 		}
 		
 		KPPicker buildPicker(Context context) {
+			if (this.fullAlbumName == null) {
+				this.fullAlbumName = context.getString(R.string.kp_all_picture);
+			}
+			File cachePath = null;
+			if (this.cacheAlbumPath != null) {
+				cachePath = new File(this.cacheAlbumPath);
+			}
+			if (cachePath == null || !cachePath.canWrite()) {
+				cachePath = context.getExternalCacheDir();
+				if (cachePath == null || !cachePath.canWrite()) {
+					cachePath = context.getCacheDir();
+					if (cachePath == null || !cachePath.canWrite()) {
+						cachePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+						if (cachePath == null || !cachePath.canWrite()) {
+							throw new RuntimeException("can't write file!");
+						}
+					}
+				}
+				cachePath = new File(cachePath, context.getString(R.string.kp_cache_name));
+			}
+			if (!cachePath.exists() && !cachePath.mkdirs()) {
+				throw new RuntimeException("can't write file!");
+			}
+			this.cacheAlbumPath = cachePath.getPath();
+			
 			KPPicker kpPicker = new KPPicker();
-			kpPicker.allPictureAlbumName = context.getString(R.string.kp_all_picture);
+			kpPicker.fullAlbumName = this.fullAlbumName;
+			kpPicker.cacheAlbumPath = this.cacheAlbumPath;
 			kpPicker.pickCount = this.pickCount;
 			kpPicker.pickAspectX = this.pickAspectX;
 			kpPicker.pickAspectY = this.pickAspectY;
 			kpPicker.pickMaxWidth = this.pickMaxWidth;
 			kpPicker.pickMaxHeight = this.pickMaxHeight;
+			kpPicker.pickEditable = this.pickEditable;
 			return kpPicker;
 		}
 	}
+	
+	
 }

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<item name="kpBack" type="id"/>
-	<item name="kpPick" type="id"/>
+	<item name="kpDone" type="id"/>
 	
 	<item name="kpRecyclerViewPicture" type="id"/>
 	<item name="kpLayer" type="id"/>
+	<item name="kpViewPager" type="id"/>
 	
 	<item name="kpAlbumLayer" type="id"/>
 	<item name="kpRecyclerViewAlbum" type="id"/>
@@ -13,6 +14,7 @@
 	<item name="kpAlbum" type="id"/>
 	<item name="kpAlbumName" type="id"/>
 	<item name="kpPreview" type="id"/>
+	<item name="kpEdit" type="id"/>
 	
 	<item name="kpPictureView" type="id"/>
 	<item name="kpTitle" type="id"/>

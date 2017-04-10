@@ -8,8 +8,10 @@ import android.provider.MediaStore;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
-class AlbumTask extends AsyncTask<Void, Void, ArrayList<AlbumInfo>> {
+class AlbumTask extends AsyncTask<Void, Void, Void> {
 	/** jpg图片属性 */
 	private final static String IMAGE_JPEG = "image/jpeg";
 	/** png图片属性 */
@@ -27,40 +29,48 @@ class AlbumTask extends AsyncTask<Void, Void, ArrayList<AlbumInfo>> {
 			MediaStore.Images.Media.DATE_ADDED
 	};
 	
-	/** 选择参数信息 */
-	private KPPicker kpPicker;
 	/** 内容解析器 */
 	private ContentResolver contentResolver;
 	/** 相册数据监听 */
 	private OnAlbumListener onAlbumListener;
+	/** 所有照片相册 */
+	private AlbumInfo fullAlbumInfo;
+	/** 缓存照片相册 */
+	private AlbumInfo cacheAlbumInfo;
+	/** 相册列表 */
+	private ArrayList<AlbumInfo> albumInfoList;
 	
 	/**
 	 * 构造方法
 	 *
-	 * @param kpPicker        选择参数信息
+	 * @param fullAlbumName   所有照片相册名称
+	 * @param cacheAlbumPath  缓存照片相册路径
 	 * @param contentResolver 内容解析器
 	 * @param onAlbumListener 相册数据监听
 	 */
-	AlbumTask(KPPicker kpPicker,
+	AlbumTask(String fullAlbumName,
+	          String cacheAlbumPath,
 	          ContentResolver contentResolver,
 	          OnAlbumListener onAlbumListener) {
-		this.kpPicker = kpPicker;
+		this.fullAlbumInfo = AlbumInfo.buildByName(fullAlbumName);
+		this.cacheAlbumInfo = AlbumInfo.buildByPath(cacheAlbumPath);
+		this.albumInfoList = new ArrayList<>();
+		
 		this.contentResolver = contentResolver;
 		this.onAlbumListener = onAlbumListener;
 	}
 	
 	@Override
-	protected ArrayList<AlbumInfo> doInBackground(Void... params) {
-		String selection = MediaStore.MediaColumns.MIME_TYPE
-				+ "=? or "
-				+ MediaStore.MediaColumns.MIME_TYPE + "=?";
+	protected Void doInBackground(Void... params) {
+		String selection =
+				MediaStore.MediaColumns.MIME_TYPE + "=? or "
+						+ MediaStore.MediaColumns.MIME_TYPE + "=?";
 		String selectionArgs[] = new String[]{IMAGE_JPEG, IMAGE_PNG};
 		
 		// 查询数据库
 		Cursor cursor = this.contentResolver.query(IMAGE_URI, IMAGE_PROJECTION, selection, selectionArgs, SORT);
-		ArrayList<AlbumInfo> albumInfoList = new ArrayList<>();
-		System.out.println(this.kpPicker.allPictureAlbumName);
-		albumInfoList.add(AlbumInfo.buildByName(this.kpPicker.allPictureAlbumName));
+		AlbumInfo fullAlbumInfo = this.fullAlbumInfo;
+		ArrayList<AlbumInfo> albumInfoList = this.albumInfoList;
 		if (cursor != null) {
 			while (cursor.moveToNext()) {
 				String picturePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA));
@@ -69,27 +79,88 @@ class AlbumTask extends AsyncTask<Void, Void, ArrayList<AlbumInfo>> {
 				PictureInfo pictureInfo = new PictureInfo();
 				pictureInfo.pictureUri = Uri.fromFile(pictureFile);
 				pictureInfo.picturePath = picturePath;
-				KPPicker.addPictureInfo(albumInfoList, pictureInfo);
+				pictureInfo.obtainPictureSize();
+				if (!pictureInfo.isAvailable()) {
+					continue;
+				}
+				fullAlbumInfo.pictureInfoList.add(pictureInfo);
+				addPictureInfo(albumInfoList, pictureInfo);
 			}
 			cursor.close();
 		}
-		return albumInfoList;
-	}
-	
-	@Override
-	protected void onPostExecute(ArrayList<AlbumInfo> albumInfoList) {
-		this.onAlbumListener.onAlbum(albumInfoList);
+		this.fullAlbumInfo = fullAlbumInfo;
+		this.albumInfoList = albumInfoList;
+		
+		AlbumInfo cacheAlbumInfo = this.cacheAlbumInfo;
+		File cachePath = new File(cacheAlbumInfo.albumPath);
+		File[] pickerFileArray = cachePath.listFiles();
+		Arrays.sort(pickerFileArray, new Comparator<File>() {
+			@Override
+			public int compare(File file1, File file2) {
+				return file1.lastModified() < file2.lastModified() ? -1 : 1;
+			}
+		});
+		for (File pictureFile : pickerFileArray) {
+			PictureInfo pictureInfo = new PictureInfo();
+			pictureInfo.pictureUri = Uri.fromFile(pictureFile);
+			pictureInfo.picturePath = pictureFile.getPath();
+			pictureInfo.obtainPictureSize();
+			if (!pictureInfo.isAvailable()) {
+				continue;
+			}
+			int index = fullAlbumInfo.pictureInfoList.indexOf(pictureInfo);
+			if (index != -1) {
+				fullAlbumInfo.pictureInfoList.remove(index);
+			}
+			fullAlbumInfo.pictureInfoList.add(0, pictureInfo);
+			cacheAlbumInfo.pictureInfoList.add(0, pictureInfo);
+		}
+		this.cacheAlbumInfo = cacheAlbumInfo;
+		
+		return null;
 	}
 	
 	/**
-	 * 相册信息列表数据监听
+	 * 添加图片信息至相册中
+	 *
+	 * @param albumInfoList 相册信息列表
+	 * @param pictureInfo   图片信息
+	 */
+	private void addPictureInfo(ArrayList<AlbumInfo> albumInfoList, PictureInfo pictureInfo) {
+		String albumPath = new File(pictureInfo.picturePath).getParentFile().getAbsolutePath();
+		for (AlbumInfo albumInfo : albumInfoList) {
+			if (albumInfo.albumPath.equals(albumPath)) {
+				albumInfo.pictureInfoList.add(0, pictureInfo);
+				return;
+			}
+		}
+		
+		AlbumInfo albumInfo = AlbumInfo.buildByPath(albumPath);
+		albumInfo.pictureInfoList.add(0, pictureInfo);
+		albumInfoList.add(albumInfo);
+	}
+	
+	@Override
+	protected void onPostExecute(Void result) {
+		this.onAlbumListener.onAlbum(
+				this.fullAlbumInfo,
+				this.cacheAlbumInfo,
+				this.albumInfoList);
+	}
+	
+	/**
+	 * 相册读取监听
 	 */
 	interface OnAlbumListener {
 		/**
-		 * 相册信息列表数据
+		 * 相册读取结果
 		 *
-		 * @param albumInfoList 相册信息列表
+		 * @param fullAlbumInfo  所有照片相册
+		 * @param cacheAlbumInfo 缓存照片相册
+		 * @param albumInfoList  相册列表
 		 */
-		void onAlbum(ArrayList<AlbumInfo> albumInfoList);
+		void onAlbum(AlbumInfo fullAlbumInfo,
+		             AlbumInfo cacheAlbumInfo,
+		             ArrayList<AlbumInfo> albumInfoList);
 	}
 }

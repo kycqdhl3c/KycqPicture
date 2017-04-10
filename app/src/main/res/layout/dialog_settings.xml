@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+	
+	<data></data>
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical"
+		android:padding="10dp">
+		
+		<android.support.design.widget.TextInputLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			
+			<android.support.design.widget.TextInputEditText
+				android:id="@+id/editMaxCount"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:hint="请输入最多图片数量"
+				android:inputType="number"
+				android:textSize="16sp"/>
+		</android.support.design.widget.TextInputLayout>
+		
+		<android.support.design.widget.TextInputLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			
+			<android.support.design.widget.TextInputEditText
+				android:id="@+id/editRowCount"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:hint="请输入单行图片数量"
+				android:inputType="number"
+				android:textSize="16sp"/>
+		</android.support.design.widget.TextInputLayout>
+		
+		<android.support.design.widget.TextInputLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			
+			<android.support.design.widget.TextInputEditText
+				android:id="@+id/editPictureRatio"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:hint="请输入图片显示比例"
+				android:inputType="numberDecimal"
+				android:textSize="16sp"/>
+		</android.support.design.widget.TextInputLayout>
+		
+		<android.support.design.widget.TextInputLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			
+			<android.support.design.widget.TextInputEditText
+				android:id="@+id/editPictureRound"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:hint="请输入图片圆角大小"
+				android:inputType="numberDecimal"
+				android:textSize="16sp"/>
+		</android.support.design.widget.TextInputLayout>
+		
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			
+			<CheckBox
+				android:id="@+id/cbInsert"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:text="支持添加图片"/>
+			
+			<CheckBox
+				android:id="@+id/cbCrop"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:text="支持裁剪图片"/>
+		</LinearLayout>
+	</LinearLayout>
+</layout>
