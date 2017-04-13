@@ -1,6 +1,7 @@
 package com.kycq.library.picture.picker;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -26,6 +28,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.kycq.library.picture.R;
+import com.kycq.library.picture.widget.LoadingDialog;
 
 import java.util.ArrayList;
 
@@ -39,6 +42,8 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	private static final int CROP = 2;
 	/** 预览 */
 	private static final int PREVIEW = 3;
+	
+	private LoadingDialog loadingDialog;
 	
 	/** 选择参数信息 */
 	private KPPicker kpPicker;
@@ -84,6 +89,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 			this.kpPicker = savedInstanceState.getParcelable(KPPicker.PICKER);
 		}
 		
+		this.loadingDialog = new LoadingDialog(this);
 		observeViews();
 		observeToolbar();
 		alterPickCount();
@@ -97,6 +103,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	}
 	
 	private void observeViews() {
+		getDelegate().requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Window window = getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -195,18 +202,44 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		}
 	}
 	
+	@SuppressLint("InflateParams")
 	private void observeToolbar() {
-		assert getSupportActionBar() != null;
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		getSupportActionBar().setCustomView(R.layout.kp_picture_picker_toolbar);
+		View customView;
+		if (getSupportActionBar() == null) {
+			customView = getLayoutInflater().inflate(R.layout.kp_picture_picker_toolbar, null);
+			addContentView(
+					customView,
+					new ViewGroup.MarginLayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT,
+							getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)
+					)
+			);
+		} else {
+			getSupportActionBar().setDisplayShowHomeEnabled(false);
+			getSupportActionBar().setDisplayShowTitleEnabled(false);
+			getSupportActionBar().setDisplayShowCustomEnabled(true);
+			getSupportActionBar().setCustomView(R.layout.kp_picture_picker_toolbar);
+			customView = getSupportActionBar().getCustomView();
+			Toolbar toolbar = (Toolbar) customView.getParent();
+			toolbar.setContentInsetsAbsolute(0, 0);
+			toolbar.setLayoutParams(
+					new FrameLayout.LayoutParams(
+							FrameLayout.LayoutParams.MATCH_PARENT,
+							getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)
+					));
+		}
 		
-		View customView = getSupportActionBar().getCustomView();
-		Toolbar toolbar = (Toolbar) customView.getParent();
-		toolbar.setContentInsetsAbsolute(0, 0);
-		toolbar.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)));
-		
+		// assert getSupportActionBar() != null;
+		// getSupportActionBar().setDisplayShowHomeEnabled(false);
+		// getSupportActionBar().setDisplayShowTitleEnabled(false);
+		// getSupportActionBar().setDisplayShowCustomEnabled(true);
+		// getSupportActionBar().setCustomView(R.layout.kp_picture_picker_toolbar);
+		//
+		// View customView = getSupportActionBar().getCustomView();
+		// Toolbar toolbar = (Toolbar) customView.getParent();
+		// toolbar.setContentInsetsAbsolute(0, 0);
+		// toolbar.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)));
+
 		View kpBack = customView.findViewById(R.id.kpBack);
 		kpBack.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -447,7 +480,8 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		showLoading();
 		this.compressTask = new CompressTask(
 				this,
-				this.kpPicker.pickMaxWidth, this.kpPicker.pickMaxHeight, this.kpPicker.pickMaxSize,
+				this.kpPicker.pickMaxWidth, this.kpPicker.pickMaxHeight,
+				this.kpPicker.pickCompressQuality,
 				new CompressTask.OnCompressListener() {
 					@Override
 					public void onCompress(ArrayList<Uri> pictureUriList) {
@@ -463,9 +497,15 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	}
 	
 	void showLoading() {
+		if (!this.loadingDialog.isShowing()) {
+			this.loadingDialog.show();
+		}
 	}
 	
 	void hideLoading() {
+		if (this.loadingDialog.isShowing()) {
+			this.loadingDialog.dismiss();
+		}
 	}
 	
 	@Override

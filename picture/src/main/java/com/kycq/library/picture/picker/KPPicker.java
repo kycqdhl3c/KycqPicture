@@ -29,7 +29,7 @@ public class KPPicker implements Parcelable {
 	int pickAspectY;
 	int pickMaxWidth;
 	int pickMaxHeight;
-	long pickMaxSize;
+	int pickCompressQuality;
 	boolean pickEditable;
 	
 	AlbumInfo fullAlbumInfo;
@@ -51,7 +51,7 @@ public class KPPicker implements Parcelable {
 		pickAspectY = in.readInt();
 		pickMaxWidth = in.readInt();
 		pickMaxHeight = in.readInt();
-		pickMaxSize = in.readLong();
+		pickCompressQuality = in.readInt();
 		pickEditable = in.readByte() != 0;
 		selectedAlbumInfo = in.readParcelable(AlbumInfo.class.getClassLoader());
 		pictureInfoList = in.createTypedArrayList(PictureInfo.CREATOR);
@@ -67,7 +67,7 @@ public class KPPicker implements Parcelable {
 		dest.writeInt(pickAspectY);
 		dest.writeInt(pickMaxWidth);
 		dest.writeInt(pickMaxHeight);
-		dest.writeLong(pickMaxSize);
+		dest.writeInt(pickCompressQuality);
 		dest.writeByte((byte) (pickEditable ? 1 : 0));
 		dest.writeParcelable(selectedAlbumInfo, flags);
 		dest.writeTypedList(pictureInfoList);
@@ -141,7 +141,7 @@ public class KPPicker implements Parcelable {
 		return pickPictureUri(data, 0);
 	}
 	
-	public static Uri pickPictureUri(Intent data, int position) {
+	private static Uri pickPictureUri(Intent data, int position) {
 		ArrayList<Uri> pictureUriList = pickPictureUriList(data);
 		if (pictureUriList == null || pictureUriList.size() < position) {
 			return null;
@@ -161,7 +161,7 @@ public class KPPicker implements Parcelable {
 		int pickAspectY;
 		int pickMaxWidth;
 		int pickMaxHeight;
-		long pickMaxSize;
+		int pickCompressQuality = 100;
 		boolean pickEditable;
 		
 		public Builder pickFullAlbumName(String fullAlbumName) {
@@ -191,8 +191,13 @@ public class KPPicker implements Parcelable {
 			return this;
 		}
 		
-		public Builder pickMaxSize(long pickMaxSize) {
-			this.pickMaxSize = pickMaxSize;
+		public Builder pickCompressQuality(int pickCompressQuality) {
+			if (pickCompressQuality < 0) {
+				pickCompressQuality = 0;
+			} else if (pickCompressQuality > 100) {
+				pickCompressQuality = 100;
+			}
+			this.pickCompressQuality = pickCompressQuality;
 			return this;
 		}
 		
@@ -247,7 +252,7 @@ public class KPPicker implements Parcelable {
 			kpPicker.pickAspectY = this.pickAspectY;
 			kpPicker.pickMaxWidth = this.pickMaxWidth;
 			kpPicker.pickMaxHeight = this.pickMaxHeight;
-			kpPicker.pickMaxSize = this.pickMaxSize;
+			kpPicker.pickCompressQuality = this.pickCompressQuality;
 			kpPicker.pickEditable = this.pickEditable;
 			return kpPicker;
 		}

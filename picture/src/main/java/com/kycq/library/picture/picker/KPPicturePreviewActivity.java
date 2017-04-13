@@ -1,5 +1,6 @@
 package com.kycq.library.picture.picker;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -32,12 +34,15 @@ public class KPPicturePreviewActivity extends AppCompatActivity {
 	
 	private KPPicker kpPicker;
 	
+	private View toolbarView;
 	private TextView kpTitle;
 	private View kpDone;
 	private ViewPager kpViewPager;
 	private View kpActionbar;
 	private View kpEdit;
 	private TextView kpSelected;
+	
+	private boolean isFullScreen;
 	
 	private boolean isPreview;
 	private PicturePagerAdapter picturePagerAdapter;
@@ -89,32 +94,41 @@ public class KPPicturePreviewActivity extends AppCompatActivity {
 		this.kpViewPager = (ViewPager) findViewById(R.id.kpViewPager);
 	}
 	
+	@SuppressLint("InflateParams")
 	private void observeToolbar() {
-		assert getSupportActionBar() != null;
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		getSupportActionBar().setCustomView(R.layout.kp_picture_preview_toolbar);
+		if (getSupportActionBar() == null) {
+			this.toolbarView = getLayoutInflater().inflate(R.layout.kp_picture_picker_toolbar, null);
+			addContentView(
+					this.toolbarView,
+					new ViewGroup.MarginLayoutParams(
+							ViewGroup.LayoutParams.MATCH_PARENT,
+							getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)
+					)
+			);
+		} else {
+			getSupportActionBar().setDisplayShowHomeEnabled(false);
+			getSupportActionBar().setDisplayShowTitleEnabled(false);
+			getSupportActionBar().setDisplayShowCustomEnabled(true);
+			getSupportActionBar().setCustomView(R.layout.kp_picture_picker_toolbar);
+			this.toolbarView = getSupportActionBar().getCustomView();
+			Toolbar toolbar = (Toolbar) this.toolbarView.getParent();
+			toolbar.setContentInsetsAbsolute(0, 0);
+			toolbar.setLayoutParams(
+					new FrameLayout.LayoutParams(
+							FrameLayout.LayoutParams.MATCH_PARENT,
+							getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)
+					));
+		}
 		
-		View customView = getSupportActionBar().getCustomView();
-		Toolbar toolbar = (Toolbar) customView.getParent();
-		toolbar.setContentInsetsAbsolute(0, 0);
-		toolbar.setLayoutParams(
-				new FrameLayout.LayoutParams(
-						FrameLayout.LayoutParams.MATCH_PARENT,
-						getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)
-				)
-		);
-		
-		View kpBack = customView.findViewById(R.id.kpBack);
+		View kpBack = this.toolbarView.findViewById(R.id.kpBack);
 		kpBack.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onBackPressed();
 			}
 		});
-		this.kpTitle = (TextView) customView.findViewById(R.id.kpTitle);
-		this.kpDone = customView.findViewById(R.id.kpDone);
+		this.kpTitle = (TextView) this.toolbarView.findViewById(R.id.kpTitle);
+		this.kpDone = this.toolbarView.findViewById(R.id.kpDone);
 		this.kpDone.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -175,7 +189,7 @@ public class KPPicturePreviewActivity extends AppCompatActivity {
 				new GestureDetector.SimpleOnGestureListener() {
 					@Override
 					public boolean onSingleTapConfirmed(MotionEvent event) {
-						toggleActionBar();
+						toggleFullScreen();
 						return true;
 					}
 				});
@@ -229,47 +243,94 @@ public class KPPicturePreviewActivity extends AppCompatActivity {
 	}
 	
 	/**
-	 * 切换标题栏显示/隐藏
+	 * 切换全屏
 	 */
-	private void toggleActionBar() {
-		assert getSupportActionBar() != null;
-		if (getSupportActionBar().isShowing()) {
-			// ActionBar
-			getSupportActionBar().hide();
-			
-			TranslateAnimation animation = new TranslateAnimation(
-					Animation.RELATIVE_TO_SELF, 0F,
-					Animation.RELATIVE_TO_SELF, 0F,
-					Animation.RELATIVE_TO_SELF, 0F,
-					Animation.RELATIVE_TO_SELF, 1F);
-			animation.setDuration(300);
-			animation.setAnimationListener(new Animation.AnimationListener() {
-				@Override
-				public void onAnimationStart(Animation animation) {
-				}
-				
-				@Override
-				public void onAnimationEnd(Animation animation) {
-					kpActionbar.setVisibility(View.GONE);
-				}
-				
-				@Override
-				public void onAnimationRepeat(Animation animation) {
-				}
-			});
-			this.kpActionbar.startAnimation(animation);
+	private void toggleFullScreen() {
+		if (this.isFullScreen) {
+			showToolbar();
+			showActionbar();
 		} else {
-			// ActionBar
-			getSupportActionBar().show();
-			
-			TranslateAnimation animation = new TranslateAnimation(
-					Animation.RELATIVE_TO_SELF, 0F,
-					Animation.RELATIVE_TO_SELF, 0F,
-					Animation.RELATIVE_TO_SELF, 1F,
-					Animation.RELATIVE_TO_SELF, 0F);
-			animation.setDuration(300);
-			this.kpActionbar.startAnimation(animation);
-			this.kpActionbar.setVisibility(View.VISIBLE);
+			hideToolbar();
+			hideActionbar();
 		}
+		this.isFullScreen = !this.isFullScreen;
+	}
+	
+	private void showToolbar() {
+		if (getSupportActionBar() != null) {
+			getSupportActionBar().show();
+			return;
+		}
+		TranslateAnimation animation = new TranslateAnimation(
+				Animation.RELATIVE_TO_SELF, 0F,
+				Animation.RELATIVE_TO_SELF, 0F,
+				Animation.RELATIVE_TO_SELF, -1F,
+				Animation.RELATIVE_TO_SELF, 0F);
+		animation.setDuration(300);
+		this.toolbarView.startAnimation(animation);
+		this.toolbarView.setVisibility(View.VISIBLE);
+	}
+	
+	private void hideToolbar() {
+		if (getSupportActionBar() != null) {
+			getSupportActionBar().hide();
+			return;
+		}
+		TranslateAnimation animation = new TranslateAnimation(
+				Animation.RELATIVE_TO_SELF, 0F,
+				Animation.RELATIVE_TO_SELF, 0F,
+				Animation.RELATIVE_TO_SELF, 0F,
+				Animation.RELATIVE_TO_SELF, -1F);
+		animation.setDuration(300);
+		animation.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				toolbarView.setVisibility(View.GONE);
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+		});
+		this.toolbarView.startAnimation(animation);
+	}
+	
+	private void showActionbar() {
+		TranslateAnimation animation = new TranslateAnimation(
+				Animation.RELATIVE_TO_SELF, 0F,
+				Animation.RELATIVE_TO_SELF, 0F,
+				Animation.RELATIVE_TO_SELF, 1F,
+				Animation.RELATIVE_TO_SELF, 0F);
+		animation.setDuration(300);
+		this.kpActionbar.startAnimation(animation);
+		this.kpActionbar.setVisibility(View.VISIBLE);
+	}
+	
+	private void hideActionbar() {
+		TranslateAnimation animation = new TranslateAnimation(
+				Animation.RELATIVE_TO_SELF, 0F,
+				Animation.RELATIVE_TO_SELF, 0F,
+				Animation.RELATIVE_TO_SELF, 0F,
+				Animation.RELATIVE_TO_SELF, 1F);
+		animation.setDuration(300);
+		animation.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				kpActionbar.setVisibility(View.GONE);
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+		});
+		this.kpActionbar.startAnimation(animation);
 	}
 }
