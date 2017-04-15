@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:focusable="true"
+		android:focusableInTouchMode="true"
+		android:orientation="vertical"
+		android:padding="10dp">
+		
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			tools:ignore="DisableBaselineAlignment">
+			
+			<android.support.design.widget.TextInputLayout
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0">
+				
+				<android.support.design.widget.TextInputEditText
+					android:id="@+id/editAspectX"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/crop_aspect_x"
+					android:inputType="numberSigned"
+					android:textSize="16sp"/>
+			</android.support.design.widget.TextInputLayout>
+			
+			<android.support.design.widget.TextInputLayout
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0">
+				
+				<android.support.design.widget.TextInputEditText
+					android:id="@+id/editAspectY"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/crop_aspect_y"
+					android:inputType="numberSigned"
+					android:textSize="16sp"/>
+			</android.support.design.widget.TextInputLayout>
+		</LinearLayout>
+		
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			tools:ignore="DisableBaselineAlignment">
+			
+			<android.support.design.widget.TextInputLayout
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0">
+				
+				<android.support.design.widget.TextInputEditText
+					android:id="@+id/editScaleWidth"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/scale_width"
+					android:inputType="numberSigned"
+					android:textSize="16sp"/>
+			</android.support.design.widget.TextInputLayout>
+			
+			<android.support.design.widget.TextInputLayout
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0">
+				
+				<android.support.design.widget.TextInputEditText
+					android:id="@+id/editScaleHeight"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="@string/scale_height"
+					android:inputType="numberSigned"
+					android:textSize="16sp"/>
+			</android.support.design.widget.TextInputLayout>
+		</LinearLayout>
+		
+		<android.support.design.widget.TextInputLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			
+			<android.support.design.widget.TextInputEditText
+				android:id="@+id/editCompressQuality"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:hint="@string/compress_quality"
+				android:inputType="numberSigned"
+				android:textSize="16sp"/>
+		</android.support.design.widget.TextInputLayout>
+		
+		<CheckBox
+			android:id="@+id/cbEditable"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:checked="true"
+			android:text="@string/support_edit"/>
+		
+		<!--<android.support.design.widget.TextInputLayout-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content">-->
+		<!---->
+		<!--<android.support.design.widget.TextInputEditText-->
+		<!--android:id="@+id/editMaxCount"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:hint="@string/please_enter_pick_max_count"-->
+		<!--android:inputType="number"-->
+		<!--android:textSize="16sp"/>-->
+		<!--</android.support.design.widget.TextInputLayout>-->
+		<!---->
+		<!--<android.support.design.widget.TextInputLayout-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content">-->
+		<!---->
+		<!--<android.support.design.widget.TextInputEditText-->
+		<!--android:id="@+id/editRowCount"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:hint="@string/please_enter_row_count"-->
+		<!--android:inputType="number"-->
+		<!--android:textSize="16sp"/>-->
+		<!--</android.support.design.widget.TextInputLayout>-->
+		<!---->
+		<!--<android.support.design.widget.TextInputLayout-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content">-->
+		<!---->
+		<!--<android.support.design.widget.TextInputEditText-->
+		<!--android:id="@+id/editPictureRatio"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:hint="@string/please_enter_picture_display_scale"-->
+		<!--android:inputType="numberDecimal"-->
+		<!--android:textSize="16sp"/>-->
+		<!--</android.support.design.widget.TextInputLayout>-->
+		<!---->
+		<!--<android.support.design.widget.TextInputLayout-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content">-->
+		<!---->
+		<!--<android.support.design.widget.TextInputEditText-->
+		<!--android:id="@+id/editPictureRound"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:hint="@string/please_enter_picture_corner_size"-->
+		<!--android:inputType="numberDecimal"-->
+		<!--android:textSize="16sp"/>-->
+		<!--</android.support.design.widget.TextInputLayout>-->
+		<!---->
+		<!--<LinearLayout-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="wrap_content">-->
+		<!---->
+		<!--<CheckBox-->
+		<!--android:id="@+id/cbInsert"-->
+		<!--android:layout_width="0dp"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:layout_weight="1.0"-->
+		<!--android:text="@string/support_add_images"/>-->
+		<!---->
+		<!--<CheckBox-->
+		<!--android:id="@+id/cbCrop"-->
+		<!--android:layout_width="0dp"-->
+		<!--android:layout_height="wrap_content"-->
+		<!--android:layout_weight="1.0"-->
+		<!--android:text="@string/support_crop_images"/>-->
+		<!--</LinearLayout>-->
+	</LinearLayout>
+</layout>

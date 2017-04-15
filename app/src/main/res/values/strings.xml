@@ -1,3 +1,18 @@
 <resources>
 	<string name="app_name">KycqPicture</string>
+	<string name="picker_setting">添加设置</string>
+	<string name="viewer_setting">查看设置</string>
+	<string name="support_add_images">支持添加图片</string>
+	<string name="support_crop_images">支持裁剪图片</string>
+	<string name="please_enter_picture_corner_size">请输入图片圆角大小</string>
+	<string name="please_enter_picture_display_scale">请输入图片显示比例</string>
+	<string name="please_enter_pick_max_count">请输入最多图片数量</string>
+	<string name="please_enter_row_count">请输入单行图片数量</string>
+	<string name="support_edit">支持编辑</string>
+	<string name="scale_width">缩放宽度</string>
+	<string name="scale_height">缩放高度</string>
+	<string name="crop_aspect_y">裁剪比例Y</string>
+	<string name="crop_aspect_x">裁剪比例X</string>
+	<string name="compress_quality">压缩质量(0-100)</string>
+	<string name="comfirm">确定</string>
 </resources>

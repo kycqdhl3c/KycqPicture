@@ -9,8 +9,7 @@
 	<android.support.v4.view.ViewPager
 		android:id="@id/kpViewPager"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:background="@color/kpBackgroundColor"/>
+		android:layout_height="match_parent"/>
 	
 	<LinearLayout
 		android:id="@id/kpActionbar"
@@ -44,10 +43,11 @@
 			android:background="?android:attr/selectableItemBackground"
 			android:drawableLeft="@drawable/kp_ic_picture_check"
 			android:drawablePadding="3dp"
+			android:drawableStart="@drawable/kp_ic_picture_check"
 			android:gravity="center_vertical"
 			android:padding="12dp"
+			android:text="@string/kp_selected"
 			android:textColor="@android:color/white"
-			android:textSize="14sp"
-			tools:text="@string/kp_selected"/>
+			android:textSize="14sp"/>
 	</LinearLayout>
 </RelativeLayout>

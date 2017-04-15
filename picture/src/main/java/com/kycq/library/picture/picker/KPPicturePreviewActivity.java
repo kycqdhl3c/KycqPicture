@@ -36,7 +36,7 @@ public class KPPicturePreviewActivity extends AppCompatActivity {
 	
 	private View toolbarView;
 	private TextView kpTitle;
-	private View kpDone;
+	private TextView kpDone;
 	private ViewPager kpViewPager;
 	private View kpActionbar;
 	private View kpEdit;
@@ -82,6 +82,7 @@ public class KPPicturePreviewActivity extends AppCompatActivity {
 	}
 	
 	private void observeViews() {
+		getWindow().setBackgroundDrawableResource(R.color.kpBackgroundColor);
 		getDelegate().requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Window window = getWindow();
@@ -128,7 +129,7 @@ public class KPPicturePreviewActivity extends AppCompatActivity {
 			}
 		});
 		this.kpTitle = (TextView) this.toolbarView.findViewById(R.id.kpTitle);
-		this.kpDone = this.toolbarView.findViewById(R.id.kpDone);
+		this.kpDone = (TextView) this.toolbarView.findViewById(R.id.kpDone);
 		this.kpDone.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -172,14 +173,12 @@ public class KPPicturePreviewActivity extends AppCompatActivity {
 	}
 	
 	private void alterPickCount() {
-		if (this.kpPicker.pickCount == 1) {
-			this.kpSelected.setText(R.string.kp_selected);
-		} else {
-			this.kpSelected.setText(
+		if (this.kpPicker.pickCount > 1) {
+			this.kpDone.setEnabled(this.kpPicker.pictureInfoList.size() > 0);
+			this.kpDone.setText(
 					getString(R.string.kp_format_selected,
 							this.kpPicker.pictureInfoList.size(), this.kpPicker.pickCount)
 			);
-			this.kpDone.setEnabled(this.kpPicker.pictureInfoList.size() > 0);
 		}
 	}
 	

@@ -108,11 +108,11 @@ class AlbumTask extends AsyncTask<Void, Void, Void> {
 			if (!pictureInfo.isAvailable()) {
 				continue;
 			}
-			int index = fullAlbumInfo.pictureInfoList.indexOf(pictureInfo);
-			if (index != -1) {
-				fullAlbumInfo.pictureInfoList.remove(index);
-			}
-			fullAlbumInfo.pictureInfoList.add(0, pictureInfo);
+			// int index = fullAlbumInfo.pictureInfoList.indexOf(pictureInfo);
+			// if (index != -1) {
+			// 	fullAlbumInfo.pictureInfoList.remove(index);
+			// }
+			// fullAlbumInfo.pictureInfoList.add(0, pictureInfo);
 			cacheAlbumInfo.pictureInfoList.add(0, pictureInfo);
 		}
 		this.cacheAlbumInfo = cacheAlbumInfo;

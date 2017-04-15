@@ -3,7 +3,7 @@
 	<string name="kp_format_select_picture">选择照片(%1$d/%2$d)</string>
 	<string name="kp_all_picture">所有图片</string>
 	<string name="kp_preview">预览</string>
-	<string name="kp_format_preview">预览(%1$d/%2$d)</string>
+	<string name="kp_format_preview">预览(%d)</string>
 	<string name="kp_format_pieces_of_picture">%d张</string>
 	<string name="kp_picture_error">图片信息错误,无法加载</string>
 	<string name="kp_selected">选择</string>

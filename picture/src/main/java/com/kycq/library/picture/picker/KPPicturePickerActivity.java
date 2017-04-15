@@ -33,8 +33,8 @@ import com.kycq.library.picture.widget.LoadingDialog;
 import java.util.ArrayList;
 
 public class KPPicturePickerActivity extends AppCompatActivity {
-	/** 读取文件权限 */
-	private static final int PERMISSION_STORAGE = 1;
+	/** 权限 */
+	private static final int PERMISSION = 1;
 	
 	/** 拍照 */
 	private static final int CAMERA = 1;
@@ -48,7 +48,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	/** 选择参数信息 */
 	private KPPicker kpPicker;
 	
-	private View kpDone;
+	private TextView kpDone;
 	private RecyclerView kpRecyclerViewPicture;
 	private View kpAlbumLayer;
 	private RecyclerView kpRecyclerViewAlbum;
@@ -103,6 +103,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	}
 	
 	private void observeViews() {
+		getWindow().setBackgroundDrawableResource(R.color.kpBackgroundColor);
 		getDelegate().requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Window window = getWindow();
@@ -229,17 +230,6 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 					));
 		}
 		
-		// assert getSupportActionBar() != null;
-		// getSupportActionBar().setDisplayShowHomeEnabled(false);
-		// getSupportActionBar().setDisplayShowTitleEnabled(false);
-		// getSupportActionBar().setDisplayShowCustomEnabled(true);
-		// getSupportActionBar().setCustomView(R.layout.kp_picture_picker_toolbar);
-		//
-		// View customView = getSupportActionBar().getCustomView();
-		// Toolbar toolbar = (Toolbar) customView.getParent();
-		// toolbar.setContentInsetsAbsolute(0, 0);
-		// toolbar.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)));
-
 		View kpBack = customView.findViewById(R.id.kpBack);
 		kpBack.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -247,7 +237,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 				onBackPressed();
 			}
 		});
-		this.kpDone = customView.findViewById(R.id.kpDone);
+		this.kpDone = (TextView) customView.findViewById(R.id.kpDone);
 		this.kpDone.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -264,11 +254,14 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 			this.kpDone.setVisibility(View.GONE);
 		} else {
 			this.kpPreview.setText(
-					getString(R.string.kp_format_preview,
-							this.kpPicker.pictureInfoList.size(), this.kpPicker.pickCount)
+					getString(R.string.kp_format_preview, this.kpPicker.pictureInfoList.size())
 			);
 			this.kpPreview.setEnabled(this.kpPicker.pictureInfoList.size() > 0);
 			this.kpDone.setEnabled(this.kpPicker.pictureInfoList.size() > 0);
+			this.kpDone.setText(
+					getString(R.string.kp_format_selected,
+							this.kpPicker.pictureInfoList.size(), this.kpPicker.pickCount)
+			);
 		}
 	}
 	
@@ -377,9 +370,8 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 								if (kpPicker.pickCount == 1) {
 									requestCompress();
 								}
-								return false;
+								return true;
 							}
-							pictureInfo.selected = true;
 							
 							if (kpPicker.pickCount == 1) {
 								if (kpPicker.pickEditable) {
@@ -390,8 +382,9 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 									kpPicker.pictureInfoList.add(pictureInfo);
 									requestCompress();
 								}
-								return false;
+								return true;
 							} else {
+								pictureInfo.selected = true;
 								kpPicker.pictureInfoList.add(pictureInfo);
 							}
 						}
@@ -635,15 +628,19 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 						this,
 						new String[]{
 								Manifest.permission.READ_EXTERNAL_STORAGE,
-								Manifest.permission.WRITE_EXTERNAL_STORAGE
+								Manifest.permission.WRITE_EXTERNAL_STORAGE,
+								Manifest.permission.CAMERA
 						},
-						PERMISSION_STORAGE
+						PERMISSION
 				);
 			} else {
 				ActivityCompat.requestPermissions(
 						this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						PERMISSION_STORAGE
+						new String[]{
+								Manifest.permission.WRITE_EXTERNAL_STORAGE,
+								Manifest.permission.CAMERA
+						},
+						PERMISSION
 				);
 			}
 			return false;
@@ -653,7 +650,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-		if (requestCode == PERMISSION_STORAGE) {
+		if (requestCode == PERMISSION) {
 			if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 				requestAlbum();
 			} else {

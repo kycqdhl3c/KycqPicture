@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +17,7 @@ import com.kycq.library.picture.picker.KPPicker;
 import com.kycq.library.picture.viewer.KPViewer;
 import com.kycq.library.picture.widget.PictureLayout;
 import com.kycq.picture.databinding.ActivitySplashBinding;
-import com.kycq.picture.databinding.DialogSettingsBinding;
+import com.kycq.picture.databinding.DialogPickSettingsBinding;
 
 public class SplashActivity extends AppCompatActivity {
 	/** 选取图片 */
@@ -26,15 +27,35 @@ public class SplashActivity extends AppCompatActivity {
 	
 	private ActivitySplashBinding mDataBinding;
 	
-	private boolean isCrop = true;
+	private PickInfo pickInfo = new PickInfo();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
 		
+		observePickInfo();
+		
 		observeViewer();
 		observePicker();
+	}
+	
+	private void observePickInfo() {
+		DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		this.pickInfo.scaleWidth = displayMetrics.widthPixels;
+		this.pickInfo.scaleHeight = displayMetrics.heightPixels;
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putParcelable(PickInfo.class.getName(), this.pickInfo);
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		this.pickInfo = savedInstanceState.getParcelable(PickInfo.class.getName());
 	}
 	
 	private void observeViewer() {
@@ -63,9 +84,10 @@ public class SplashActivity extends AppCompatActivity {
 			public void onInsert() {
 				new KPPicker.Builder()
 						.pickCount(mDataBinding.pictureLayout.getMaxCount() - mDataBinding.pictureLayout.size())
-						.pickMaxScale(1080, 0)
-						.pickCompressQuality(80)
-						.pickEditable(isCrop)
+						.pickEditable(pickInfo.isEditable)
+						.pickAspect(pickInfo.aspectX, pickInfo.aspectY)
+						.pickMaxScale(pickInfo.scaleWidth, pickInfo.scaleHeight)
+						.pickCompressQuality(pickInfo.compressQuality)
 						.pick(SplashActivity.this, PICKER);
 			}
 			
@@ -88,66 +110,114 @@ public class SplashActivity extends AppCompatActivity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add("设置")
-				.setIcon(R.drawable.ic_settings)
-				.setVisible(true)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		menu.add(0, R.id.pickerSetting, 0, R.string.picker_setting);
+		menu.add(0, R.id.viewerSetting, 0, R.string.viewer_setting);
 		return true;
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		final DialogSettingsBinding dataBinding = DataBindingUtil.inflate(
+		if (item.getItemId() == R.id.pickerSetting) {
+			observePickerSetting();
+		} else {
+			
+		}
+		return true;
+	}
+	
+	private void observePickerSetting() {
+		final DialogPickSettingsBinding dataBinding = DataBindingUtil.inflate(
 				getLayoutInflater(),
-				R.layout.dialog_settings,
+				R.layout.dialog_pick_settings,
 				null, false
 		);
-		dataBinding.editMaxCount.setText(String.valueOf(mDataBinding.pictureLayout.getMaxCount()));
-		dataBinding.editRowCount.setText(String.valueOf(mDataBinding.pictureLayout.getRowCount()));
-		dataBinding.editPictureRatio.setText(String.valueOf(mDataBinding.pictureLayout.getPictureRatio()));
-		dataBinding.editPictureRound.setText(String.valueOf(mDataBinding.pictureLayout.getPictureRound()));
-		dataBinding.cbInsert.setChecked(mDataBinding.pictureLayout.isSupportInsert());
+		dataBinding.editAspectX.setText(String.valueOf(pickInfo.aspectX));
+		dataBinding.editAspectY.setText(String.valueOf(pickInfo.aspectY));
+		dataBinding.editScaleWidth.setText(String.valueOf(pickInfo.scaleWidth));
+		dataBinding.editScaleHeight.setText(String.valueOf(pickInfo.scaleHeight));
+		dataBinding.editCompressQuality.setText(String.valueOf(pickInfo.compressQuality));
+		dataBinding.cbEditable.setChecked(pickInfo.isEditable);
+		
 		new AlertDialog.Builder(this)
-				.setTitle("设置")
+				.setTitle(R.string.picker_setting)
 				.setView(dataBinding.getRoot())
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				.setPositiveButton(R.string.comfirm, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						int maxCount = 5;
-						int rowCount = 0;
-						float pictureRatio = 0F;
-						float pictureRound = 0F;
-						
-						String maxCountStr = dataBinding.editMaxCount.getText().toString().trim();
-						if (maxCountStr.length() > 0) {
-							maxCount = Integer.parseInt(maxCountStr);
+						String aspectX = dataBinding.editAspectX.getText().toString().trim();
+						if (aspectX.length() > 0) {
+							pickInfo.aspectX = Integer.parseInt(aspectX);
 						}
 						
-						String rowCountStr = dataBinding.editRowCount.getText().toString().trim();
-						if (rowCountStr.length() > 0) {
-							rowCount = Integer.parseInt(rowCountStr);
+						String aspectY = dataBinding.editAspectY.getText().toString().trim();
+						if (aspectY.length() > 0) {
+							pickInfo.aspectY = Integer.parseInt(aspectY);
 						}
 						
-						String pictureRatioStr = dataBinding.editPictureRatio.getText().toString().trim();
-						if (pictureRatioStr.length() > 0) {
-							pictureRatio = Float.parseFloat(pictureRatioStr);
+						String scaleWidth = dataBinding.editScaleWidth.getText().toString().trim();
+						if (scaleWidth.length() > 0) {
+							pickInfo.scaleWidth = Integer.parseInt(scaleWidth);
+						}
+						String scaleHeight = dataBinding.editScaleHeight.getText().toString().trim();
+						if (scaleHeight.length() > 0) {
+							pickInfo.scaleHeight = Integer.parseInt(scaleHeight);
 						}
 						
-						String pictureRoundStr = dataBinding.editPictureRound.getText().toString().trim();
-						if (pictureRoundStr.length() > 0) {
-							pictureRound = Float.parseFloat(pictureRoundStr);
+						String compressQuality = dataBinding.editCompressQuality.getText().toString().trim();
+						if (compressQuality.length() > 0) {
+							pickInfo.compressQuality = Integer.parseInt(compressQuality);
 						}
 						
-						mDataBinding.pictureLayout.setMaxCount(maxCount);
-						mDataBinding.pictureLayout.setRowCount(rowCount);
-						mDataBinding.pictureLayout.setPictureRatio(pictureRatio);
-						mDataBinding.pictureLayout.setPictureRound(pictureRound);
-						mDataBinding.pictureLayout.setSupportInsert(dataBinding.cbInsert.isChecked());
-						isCrop = dataBinding.cbCrop.isChecked();
+						pickInfo.isEditable = dataBinding.cbEditable.isChecked();
 					}
 				})
 				.show();
-		return true;
+		
+		// dataBinding.editMaxCount.setText(String.valueOf(mDataBinding.pictureLayout.getMaxCount()));
+		// dataBinding.editRowCount.setText(String.valueOf(mDataBinding.pictureLayout.getRowCount()));
+		// dataBinding.editPictureRatio.setText(String.valueOf(mDataBinding.pictureLayout.getPictureRatio()));
+		// dataBinding.editPictureRound.setText(String.valueOf(mDataBinding.pictureLayout.getPictureRound()));
+		// dataBinding.cbInsert.setChecked(mDataBinding.pictureLayout.isSupportInsert());
+		// new AlertDialog.Builder(this)
+		// 		.setTitle("设置")
+		// 		.setView(dataBinding.getRoot())
+		// 		.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+		// 			@Override
+		// 			public void onClick(DialogInterface dialog, int which) {
+		// 				int maxCount = 5;
+		// 				int rowCount = 0;
+		// 				float pictureRatio = 0F;
+		// 				float pictureRound = 0F;
+		//
+		// 				String maxCountStr = dataBinding.editMaxCount.getText().toString().trim();
+		// 				if (maxCountStr.length() > 0) {
+		// 					maxCount = Integer.parseInt(maxCountStr);
+		// 				}
+		//
+		// 				String rowCountStr = dataBinding.editRowCount.getText().toString().trim();
+		// 				if (rowCountStr.length() > 0) {
+		// 					rowCount = Integer.parseInt(rowCountStr);
+		// 				}
+		//
+		// 				String pictureRatioStr = dataBinding.editPictureRatio.getText().toString().trim();
+		// 				if (pictureRatioStr.length() > 0) {
+		// 					pictureRatio = Float.parseFloat(pictureRatioStr);
+		// 				}
+		//
+		// 				String pictureRoundStr = dataBinding.editPictureRound.getText().toString().trim();
+		// 				if (pictureRoundStr.length() > 0) {
+		// 					pictureRound = Float.parseFloat(pictureRoundStr);
+		// 				}
+		//
+		// 				mDataBinding.pictureLayout.setMaxCount(maxCount);
+		// 				mDataBinding.pictureLayout.setRowCount(rowCount);
+		// 				mDataBinding.pictureLayout.setPictureRatio(pictureRatio);
+		// 				mDataBinding.pictureLayout.setPictureRound(pictureRound);
+		// 				mDataBinding.pictureLayout.setSupportInsert(dataBinding.cbInsert.isChecked());
+		// 				isCrop = dataBinding.cbCrop.isChecked();
+		// 			}
+		// 		})
+		// 		.show();
 	}
 	
 	@Override
