@@ -51,7 +51,7 @@
 				android:id="@id/kpAlbumName"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:textColor="@android:color/white"
+				android:textColor="@color/kp_tv_alter"
 				android:textSize="14sp"
 				tools:text="@string/kp_all_picture"/>
 			

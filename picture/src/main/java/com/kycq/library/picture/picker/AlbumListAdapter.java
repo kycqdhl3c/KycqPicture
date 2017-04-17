@@ -1,6 +1,7 @@
 package com.kycq.library.picture.picker;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -135,11 +136,13 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 				this.kpSelected.setVisibility(View.INVISIBLE);
 			}
 			
+			Uri pictureUri = albumInfo.pictureInfoList.size() > 0
+					? albumInfo.pictureInfoList.get(0).pictureUri : Uri.parse("res:///" + R.drawable.kp_ic_camera);
 			this.kpPictureView.setController(
 					Fresco.newDraweeControllerBuilder()
 							.setOldController(this.kpPictureView.getController())
 							.setImageRequest(
-									ImageRequestBuilder.newBuilderWithSource(albumInfo.pictureInfoList.get(0).pictureUri)
+									ImageRequestBuilder.newBuilderWithSource(pictureUri)
 											.setResizeOptions(new ResizeOptions(300, 300))
 											.build()
 							)

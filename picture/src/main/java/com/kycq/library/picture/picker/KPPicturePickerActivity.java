@@ -284,6 +284,10 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 						selectPictureInfoList();
 						
 						kpActionbar.setVisibility(View.VISIBLE);
+						boolean enabled = !(kpPicker.fullAlbumInfo.pictureInfoList.isEmpty()
+								&& kpPicker.albumInfoList.isEmpty());
+						kpAlbum.setEnabled(enabled);
+						kpAlbumName.setEnabled(enabled);
 						observeAlbumList();
 					}
 				});
@@ -621,15 +625,16 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	 * @return true已授权
 	 */
 	private boolean requestStoragePermission() {
+		System.out.println(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED);
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-				|| ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+				|| ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+				) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 				ActivityCompat.requestPermissions(
 						this,
 						new String[]{
 								Manifest.permission.READ_EXTERNAL_STORAGE,
-								Manifest.permission.WRITE_EXTERNAL_STORAGE,
-								Manifest.permission.CAMERA
+								Manifest.permission.WRITE_EXTERNAL_STORAGE
 						},
 						PERMISSION
 				);
@@ -637,8 +642,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 				ActivityCompat.requestPermissions(
 						this,
 						new String[]{
-								Manifest.permission.WRITE_EXTERNAL_STORAGE,
-								Manifest.permission.CAMERA
+								Manifest.permission.WRITE_EXTERNAL_STORAGE
 						},
 						PERMISSION
 				);
@@ -651,11 +655,13 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		if (requestCode == PERMISSION) {
-			if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-				requestAlbum();
-			} else {
-				finish();
+			for (int grant : grantResults) {
+				if (grant == PackageManager.PERMISSION_DENIED) {
+					finish();
+					return;
+				}
 			}
+			requestAlbum();
 			return;
 		}
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
