@@ -137,7 +137,7 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 			}
 			
 			Uri pictureUri = albumInfo.pictureInfoList.size() > 0
-					? albumInfo.pictureInfoList.get(0).pictureUri : Uri.parse("res:///" + R.drawable.kp_ic_camera);
+					? albumInfo.pictureInfoList.get(0).pictureUri : Uri.EMPTY;
 			this.kpPictureView.setController(
 					Fresco.newDraweeControllerBuilder()
 							.setOldController(this.kpPictureView.getController())
