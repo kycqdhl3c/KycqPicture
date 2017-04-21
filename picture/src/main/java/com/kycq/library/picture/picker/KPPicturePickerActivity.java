@@ -555,11 +555,14 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 				if (data.getBooleanExtra(KPPicturePreviewActivity.PREVIEW_PREVIEW, false)) {
 					pictureInfoList = this.kpPicker.pictureInfoList;
 				} else {
-					pictureInfoList = this.pictureListAdapter.getAlbumInfo().pictureInfoList;
+					pictureInfoList = this.kpPicker.fullAlbumInfo.pictureInfoList;
 				}
 				
 				for (PictureInfo pictureInfo : previewSelectedInfoList) {
 					int index = pictureInfoList.indexOf(pictureInfo);
+					if (index < 0) {
+						continue;
+					}
 					PictureInfo selectedPictureInfo = pictureInfoList.get(index);
 					selectedPictureInfo.selected = true;
 					resultInfoList.add(selectedPictureInfo);

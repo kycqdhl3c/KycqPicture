@@ -14,9 +14,9 @@ class PictureInfo implements Parcelable {
 	/** 图片路径 */
 	String picturePath;
 	/** 图片宽度 */
-	int pictureWidth;
+	private int pictureWidth;
 	/** 图片高度 */
-	int pictureHeight;
+	private int pictureHeight;
 	/** 图片选择状态 */
 	boolean selected;
 	

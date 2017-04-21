@@ -33,10 +33,6 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 		this.onPictureListener = onPictureListener;
 	}
 	
-	AlbumInfo getAlbumInfo() {
-		return this.albumInfo;
-	}
-	
 	/**
 	 * 选中图片
 	 *
