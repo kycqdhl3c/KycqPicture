@@ -41,5 +41,5 @@
 		android:id="@id/kpSelected"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:src="@drawable/kp_ic_album_check_selected"/>
+		android:src="@drawable/kp_ic_album_check"/>
 </LinearLayout>

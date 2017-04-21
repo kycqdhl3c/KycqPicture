@@ -4,6 +4,4 @@
 	<color name="kpActionBarColor">#323232</color>
 	<color name="kpBackgroundColor">#202020</color>
 	<color name="kpLayerColor">#99000000</color>
-	<color name="kpPictureSelectedColor">#55000000</color>
-	<color name="kpPictureUnSelectedColor">#10000000</color>
 </resources>

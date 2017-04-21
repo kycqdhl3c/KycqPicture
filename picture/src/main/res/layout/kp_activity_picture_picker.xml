@@ -4,6 +4,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	android:background="@color/kpBackgroundColor"
 	tools:context=".picker.KPPicturePickerActivity">
 	
 	<android.support.v7.widget.RecyclerView
@@ -60,7 +61,7 @@
 				android:layout_height="wrap_content"
 				android:layout_gravity="bottom"
 				android:layout_marginLeft="3dp"
-				android:src="@drawable/kp_bg_album_indicator"
+				android:src="@drawable/kp_ic_album_indicator"
 				tools:ignore="RtlHardcoded"/>
 		</LinearLayout>
 		

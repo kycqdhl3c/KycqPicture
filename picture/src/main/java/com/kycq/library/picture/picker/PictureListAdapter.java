@@ -33,7 +33,7 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 		this.onPictureListener = onPictureListener;
 	}
 	
-	public AlbumInfo getAlbumInfo() {
+	AlbumInfo getAlbumInfo() {
 		return this.albumInfo;
 	}
 	
@@ -170,14 +170,9 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 					);
 			
 			this.kpLayer.setVisibility(View.VISIBLE);
+			this.kpLayer.setSelected(pictureInfo.selected);
 			this.kpSelected.setVisibility(isSingle ? View.GONE : View.VISIBLE);
-			if (pictureInfo.selected) {
-				this.kpLayer.setBackgroundResource(R.color.kpPictureSelectedColor);
-				this.kpSelected.setImageResource(R.drawable.kp_ic_picture_check_selected);
-			} else {
-				this.kpLayer.setBackgroundResource(R.color.kpPictureUnSelectedColor);
-				this.kpSelected.setImageResource(R.drawable.kp_ic_picture_check_unselected);
-			}
+			this.kpSelected.setSelected(pictureInfo.selected);
 			
 			this.kpPictureView.setController(
 					Fresco.newDraweeControllerBuilder()

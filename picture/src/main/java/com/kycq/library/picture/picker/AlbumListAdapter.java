@@ -130,11 +130,7 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 			this.kpTitle.setText(albumInfo.albumName);
 			this.kpContent.setText(inflater.getContext().getString(
 					R.string.kp_format_pieces_of_picture, albumInfo.pictureInfoList.size()));
-			if (selectedPosition == getAdapterPosition()) {
-				this.kpSelected.setVisibility(View.VISIBLE);
-			} else {
-				this.kpSelected.setVisibility(View.INVISIBLE);
-			}
+			this.kpSelected.setSelected(selectedPosition == getAdapterPosition());
 			
 			Uri pictureUri = albumInfo.pictureInfoList.size() > 0
 					? albumInfo.pictureInfoList.get(0).pictureUri : Uri.EMPTY;

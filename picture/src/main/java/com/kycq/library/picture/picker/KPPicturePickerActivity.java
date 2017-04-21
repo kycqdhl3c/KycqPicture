@@ -103,12 +103,11 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	}
 	
 	private void observeViews() {
-		getWindow().setBackgroundDrawableResource(R.color.kpBackgroundColor);
 		getDelegate().requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Window window = getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.setStatusBarColor(getResources().getColor(R.color.kpStatusBarColor));
+			window.setStatusBarColor(ActivityCompat.getColor(this, R.color.kpStatusBarColor));
 		}
 		
 		setContentView(R.layout.kp_activity_picture_picker);
@@ -625,7 +624,6 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	 * @return true已授权
 	 */
 	private boolean requestStoragePermission() {
-		System.out.println(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED);
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
 				|| ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
 				) {

@@ -55,12 +55,11 @@ public class KPPictureViewerActivity extends AppCompatActivity {
 	}
 	
 	private void observeViews() {
-		getWindow().setBackgroundDrawableResource(R.color.kpBackgroundColor);
 		getDelegate().requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			Window window = getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.setStatusBarColor(getResources().getColor(R.color.kpStatusBarColor));
+			window.setStatusBarColor(ActivityCompat.getColor(this, R.color.kpStatusBarColor));
 		}
 		
 		setContentView(R.layout.kp_activity_picture_viewer);

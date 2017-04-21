@@ -16,7 +16,8 @@
 	<View
 		android:id="@id/kpLayer"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"/>
+		android:layout_height="match_parent"
+		android:background="@drawable/kp_bg_picture_layer"/>
 	
 	<ImageView
 		android:id="@id/kpSelected"
@@ -24,6 +25,6 @@
 		android:layout_height="wrap_content"
 		android:layout_gravity="end"
 		android:padding="5dp"
-		android:src="@drawable/kp_ic_picture_check_unselected"/>
+		android:src="@drawable/kp_ic_picture_check"/>
 
 </FrameLayout>
