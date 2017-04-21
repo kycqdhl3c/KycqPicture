@@ -9,16 +9,15 @@
               android:paddingBottom="5dp"
               android:paddingLeft="10dp"
               android:paddingRight="10dp"
-              android:paddingTop="5dp"
-              tools:background="@color/kpActionBarColor">
+              android:paddingTop="5dp">
 	
 	<com.facebook.drawee.view.SimpleDraweeView
 		android:id="@id/kpPictureView"
 		android:layout_width="60dp"
 		android:layout_height="60dp"
-		app:failureImage="@drawable/kp_ic_picture_error_dark"
+		app:failureImage="@drawable/kp_light_ic_picture_error"
 		app:failureImageScaleType="fitXY"
-		app:placeholderImage="@drawable/kp_ic_picture_loading_dark"
+		app:placeholderImage="@drawable/kp_light_ic_picture_loading"
 		app:placeholderImageScaleType="fitXY"/>
 	
 	<LinearLayout
@@ -32,7 +31,7 @@
 			android:id="@id/kpTitle"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:textColor="@color/kp_tv_alter_dark"
+			android:textColor="@color/kp_light_tv_alter"
 			android:textSize="16sp"
 			tools:text="@string/kp_all_picture"/>
 		
@@ -41,7 +40,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="5dp"
-			android:textColor="#CCCCCC"
+			android:textColor="#999999"
 			android:textSize="14sp"
 			tools:text="@string/kp_format_pieces_of_picture"/>
 	</LinearLayout>
@@ -50,5 +49,5 @@
 		android:id="@id/kpSelected"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:src="@drawable/kp_ic_album_check_dark"/>
+		android:src="@drawable/kp_light_ic_album_check"/>
 </LinearLayout>

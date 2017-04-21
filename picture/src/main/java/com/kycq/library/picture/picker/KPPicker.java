@@ -8,19 +8,40 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.IntDef;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 
 import com.kycq.library.picture.R;
 
 import java.io.File;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
 public class KPPicker implements Parcelable {
+	/** 暗色主题 */
+	public static final int DARK = 1;
+	/** 亮色主题 */
+	public static final int LIGHT = 2;
+	
 	/** 选择参数 */
 	static final String PICKER = "picker";
 	/** 输出图片列表 */
 	static final String PICKER_LIST = "pickerList";
+	
+	@Retention(RetentionPolicy.CLASS)
+	@IntDef({DARK, LIGHT})
+	@interface PickStyle {
+	}
+	
+	int statusBarColor;
+	boolean lightStatusBar;
+	int pickerLayoutId = R.layout.kp_light_activity_picture_picker;
+	int cameraListLayoutId = R.layout.kp_light_item_camera_list;
+	int pictureListLayoutId = R.layout.kp_light_item_picture_list;
+	int albumListLayoutId = R.layout.kp_light_item_album_list;
+	int previewLayoutId = R.layout.kp_light_activity_picture_preview;
 	
 	String fullAlbumName;
 	String cacheAlbumPath;
@@ -44,6 +65,14 @@ public class KPPicker implements Parcelable {
 	}
 	
 	private KPPicker(Parcel in) {
+		statusBarColor = in.readInt();
+		lightStatusBar = in.readByte() == 1;
+		pickerLayoutId = in.readInt();
+		cameraListLayoutId = in.readInt();
+		pictureListLayoutId = in.readInt();
+		albumListLayoutId = in.readInt();
+		previewLayoutId = in.readInt();
+		
 		fullAlbumName = in.readString();
 		cacheAlbumPath = in.readString();
 		pickCount = in.readInt();
@@ -53,6 +82,7 @@ public class KPPicker implements Parcelable {
 		pickMaxHeight = in.readInt();
 		pickCompressQuality = in.readInt();
 		pickEditable = in.readByte() != 0;
+		
 		selectedAlbumInfo = in.readParcelable(AlbumInfo.class.getClassLoader());
 		pictureInfoList = in.createTypedArrayList(PictureInfo.CREATOR);
 		pictureInfo = in.readParcelable(PictureInfo.class.getClassLoader());
@@ -60,6 +90,14 @@ public class KPPicker implements Parcelable {
 	
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(statusBarColor);
+		dest.writeByte((byte) (lightStatusBar ? 1 : 0));
+		dest.writeInt(pickerLayoutId);
+		dest.writeInt(cameraListLayoutId);
+		dest.writeInt(pictureListLayoutId);
+		dest.writeInt(albumListLayoutId);
+		dest.writeInt(previewLayoutId);
+		
 		dest.writeString(fullAlbumName);
 		dest.writeString(cacheAlbumPath);
 		dest.writeInt(pickCount);
@@ -69,6 +107,7 @@ public class KPPicker implements Parcelable {
 		dest.writeInt(pickMaxHeight);
 		dest.writeInt(pickCompressQuality);
 		dest.writeByte((byte) (pickEditable ? 1 : 0));
+		
 		dest.writeParcelable(selectedAlbumInfo, flags);
 		dest.writeTypedList(pictureInfoList);
 		dest.writeParcelable(pictureInfo, flags);
@@ -154,6 +193,8 @@ public class KPPicker implements Parcelable {
 	}
 	
 	public static class Builder {
+		@PickStyle
+		int pickStyle = DARK;
 		String fullAlbumName;
 		String cacheAlbumPath;
 		int pickCount;
@@ -163,6 +204,11 @@ public class KPPicker implements Parcelable {
 		int pickMaxHeight;
 		int pickCompressQuality = 100;
 		boolean pickEditable;
+		
+		public Builder pickStyle(@PickStyle int pickStyle) {
+			this.pickStyle = pickStyle;
+			return this;
+		}
 		
 		public Builder pickFullAlbumName(String fullAlbumName) {
 			this.fullAlbumName = fullAlbumName;
@@ -245,6 +291,24 @@ public class KPPicker implements Parcelable {
 			this.cacheAlbumPath = cachePath.getPath();
 			
 			KPPicker kpPicker = new KPPicker();
+			if (this.pickStyle == DARK) {
+				kpPicker.statusBarColor = 0xFF222222;
+				kpPicker.lightStatusBar = false;
+				kpPicker.pickerLayoutId = R.layout.kp_dark_activity_picture_picker;
+				kpPicker.cameraListLayoutId = R.layout.kp_dark_item_camera_list;
+				kpPicker.pictureListLayoutId = R.layout.kp_dark_item_picture_list;
+				kpPicker.albumListLayoutId = R.layout.kp_dark_item_album_list;
+				kpPicker.previewLayoutId = R.layout.kp_dark_activity_picture_preview;
+			} else if (this.pickStyle == LIGHT) {
+				kpPicker.statusBarColor = 0xFFF0F0F0;
+				kpPicker.lightStatusBar = true;
+				kpPicker.pickerLayoutId = R.layout.kp_light_activity_picture_picker;
+				kpPicker.cameraListLayoutId = R.layout.kp_light_item_camera_list;
+				kpPicker.pictureListLayoutId = R.layout.kp_light_item_picture_list;
+				kpPicker.albumListLayoutId = R.layout.kp_light_item_album_list;
+				kpPicker.previewLayoutId = R.layout.kp_light_activity_picture_preview;
+			}
+			
 			kpPicker.fullAlbumName = this.fullAlbumName;
 			kpPicker.cacheAlbumPath = this.cacheAlbumPath;
 			kpPicker.pickCount = this.pickCount;

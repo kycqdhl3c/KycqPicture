@@ -18,15 +18,19 @@ import com.kycq.library.picture.R;
 class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder> {
 	private LayoutInflater inflater;
 	
+	private int albumListLayoutId;
+	
 	private KPPicker kpPicker;
 	private OnAlbumListener onAlbumListener;
 	
 	private int selectedPosition = 0;
 	
 	AlbumListAdapter(Context context,
+	                 int albumListLayoutId,
 	                 KPPicker kpPicker,
 	                 OnAlbumListener onAlbumListener) {
 		this.inflater = LayoutInflater.from(context);
+		this.albumListLayoutId = albumListLayoutId;
 		this.kpPicker = kpPicker;
 		this.onAlbumListener = onAlbumListener;
 	}
@@ -83,7 +87,7 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 	
 	@Override
 	public AlbumHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		return new AlbumHolder(this.inflater.inflate(R.layout.kp_item_album_list_dark, parent, false));
+		return new AlbumHolder(this.inflater.inflate(this.albumListLayoutId, parent, false));
 	}
 	
 	@Override

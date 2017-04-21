@@ -11,7 +11,7 @@
 		android:id="@id/kpToolbar"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:background="@color/kpActionBarColor"
+		android:background="#323232"
 		android:gravity="center_vertical">
 		
 		<ImageView
@@ -21,7 +21,7 @@
 			android:background="?android:attr/selectableItemBackground"
 			android:padding="10dp"
 			android:scaleType="centerInside"
-			android:src="@drawable/kp_ic_back_dark"/>
+			android:src="@drawable/kp_dark_ic_back"/>
 		
 		<TextView
 			android:id="@id/kpTitle"
@@ -30,7 +30,7 @@
 			android:layout_weight="1.0"
 			android:gravity="center_vertical"
 			android:text="@string/kp_select_picture"
-			android:textColor="@android:color/white"
+			android:textColor="@color/kp_dark_tv_alter"
 			android:textSize="16sp"/>
 		
 		<TextView
@@ -41,7 +41,7 @@
 			android:layout_marginLeft="10dp"
 			android:layout_marginRight="10dp"
 			android:layout_marginStart="10dp"
-			android:background="@drawable/kp_bg_done_dark"
+			android:background="@drawable/kp_dark_bg_done"
 			android:gravity="center"
 			android:padding="6dp"
 			android:text="@string/kp_format_selected"
@@ -80,7 +80,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
-		android:background="@color/kpActionBarColor"
+		android:background="#323232"
 		android:gravity="center_vertical"
 		android:visibility="gone"
 		tools:visibility="visible">
@@ -96,7 +96,7 @@
 				android:id="@id/kpAlbumName"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:textColor="@color/kp_tv_alter_dark"
+				android:textColor="@color/kp_dark_tv_alter"
 				android:textSize="14sp"
 				tools:text="@string/kp_all_picture"/>
 			
@@ -105,7 +105,7 @@
 				android:layout_height="wrap_content"
 				android:layout_gravity="bottom"
 				android:layout_marginLeft="3dp"
-				android:src="@drawable/kp_ic_album_indicator_dark"
+				android:src="@drawable/kp_dark_ic_album_indicator"
 				tools:ignore="RtlHardcoded"/>
 		</LinearLayout>
 		
@@ -122,7 +122,7 @@
 			android:layout_height="wrap_content"
 			android:background="?android:attr/selectableItemBackground"
 			android:padding="12dp"
-			android:textColor="@color/kp_tv_alter_dark"
+			android:textColor="@color/kp_dark_tv_alter"
 			android:textSize="14sp"
 			tools:text="@string/kp_preview"/>
 	</LinearLayout>

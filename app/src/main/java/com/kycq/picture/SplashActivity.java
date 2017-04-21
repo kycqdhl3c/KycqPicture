@@ -83,6 +83,7 @@ public class SplashActivity extends AppCompatActivity {
 			@Override
 			public void onInsert() {
 				new KPPicker.Builder()
+						.pickStyle(pickInfo.pickStyle)
 						.pickCount(mDataBinding.pictureLayout.getMaxCount() - mDataBinding.pictureLayout.size())
 						.pickEditable(pickInfo.isEditable)
 						.pickAspect(pickInfo.aspectX, pickInfo.aspectY)
@@ -131,6 +132,14 @@ public class SplashActivity extends AppCompatActivity {
 				R.layout.dialog_pick_settings,
 				null, false
 		);
+		switch (pickInfo.pickStyle) {
+			case KPPicker.DARK:
+				dataBinding.rgPickStyle.check(R.id.rbDark);
+				break;
+			case KPPicker.LIGHT:
+				dataBinding.rgPickStyle.check(R.id.rbLight);
+				break;
+		}
 		dataBinding.editAspectX.setText(String.valueOf(pickInfo.aspectX));
 		dataBinding.editAspectY.setText(String.valueOf(pickInfo.aspectY));
 		dataBinding.editScaleWidth.setText(String.valueOf(pickInfo.scaleWidth));
@@ -141,9 +150,19 @@ public class SplashActivity extends AppCompatActivity {
 		new AlertDialog.Builder(this)
 				.setTitle(R.string.picker_setting)
 				.setView(dataBinding.getRoot())
-				.setPositiveButton(R.string.comfirm, new DialogInterface.OnClickListener() {
+				.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+						int pickStyleCheckId = dataBinding.rgPickStyle.getCheckedRadioButtonId();
+						switch (pickStyleCheckId) {
+							case R.id.rbDark:
+								pickInfo.pickStyle = KPPicker.DARK;
+								break;
+							case R.id.rbLight:
+								pickInfo.pickStyle = KPPicker.LIGHT;
+								break;
+						}
+						
 						String aspectX = dataBinding.editAspectX.getText().toString().trim();
 						if (aspectX.length() > 0) {
 							pickInfo.aspectX = Integer.parseInt(aspectX);

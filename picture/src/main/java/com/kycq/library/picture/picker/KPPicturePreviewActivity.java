@@ -3,7 +3,6 @@ package com.kycq.library.picture.picker;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
@@ -80,13 +79,16 @@ public class KPPicturePreviewActivity extends AppCompatActivity {
 	
 	private void observeViews() {
 		getDelegate().requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			Window window = getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.setStatusBarColor(ActivityCompat.getColor(this, R.color.kpStatusBarColor));
+			window.setStatusBarColor(this.kpPicker.statusBarColor);
+			if (this.kpPicker.lightStatusBar) {
+				window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+			}
 		}
 		
-		setContentView(R.layout.kp_activity_picture_preview_dark);
+		setContentView(this.kpPicker.previewLayoutId);
 		
 		this.kpViewPager = (ViewPager) findViewById(R.id.kpViewPager);
 	}

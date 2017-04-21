@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	tools:context=".picker.PictureListAdapter">
+	
+	<com.facebook.drawee.view.SimpleDraweeView
+		android:id="@id/kpPictureView"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		app:failureImage="@drawable/kp_dark_ic_picture_error"
+		app:failureImageScaleType="fitXY"
+		app:placeholderImage="@drawable/kp_dark_ic_picture_loading"
+		app:placeholderImageScaleType="fitXY"
+		app:viewAspectRatio="1.0"/>
+	
+	<View
+		android:id="@id/kpLayer"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@drawable/kp_dark_bg_picture_layer"/>
+	
+	<ImageView
+		android:id="@id/kpSelected"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="end"
+		android:padding="5dp"
+		android:src="@drawable/kp_dark_ic_picture_check"/>
+
+</FrameLayout>

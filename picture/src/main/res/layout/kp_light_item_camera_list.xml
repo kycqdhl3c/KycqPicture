@@ -12,8 +12,8 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center"
-		android:background="@android:color/black"
-		app:placeholderImage="@drawable/kp_ic_camera_dark"
+		android:background="@android:color/white"
+		app:placeholderImage="@drawable/kp_light_ic_camera"
 		app:placeholderImageScaleType="centerInside"
 		app:viewAspectRatio="1.0"/>
 

@@ -13,6 +13,9 @@
 	<string name="scale_height">缩放高度</string>
 	<string name="crop_aspect_y">裁剪比例Y</string>
 	<string name="crop_aspect_x">裁剪比例X</string>
-	<string name="compress_quality">压缩质量(0-100)</string>
-	<string name="comfirm">确定</string>
+	<string name="compress_quality">压缩质量(0&#8211;100)</string>
+	<string name="confirm">确定</string>
+	<string name="dark">dark</string>
+	<string name="light">light</string>
+	<string name="style">风格</string>
 </resources>

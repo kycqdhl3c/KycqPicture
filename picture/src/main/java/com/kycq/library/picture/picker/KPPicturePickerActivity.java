@@ -100,13 +100,16 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	
 	private void observeViews() {
 		getDelegate().requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			Window window = getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.setStatusBarColor(ActivityCompat.getColor(this, R.color.kpStatusBarColor));
+			window.setStatusBarColor(this.kpPicker.statusBarColor);
+			if (this.kpPicker.lightStatusBar) {
+				window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+			}
 		}
 		
-		setContentView(R.layout.kp_activity_picture_picker_dark);
+		setContentView(this.kpPicker.pickerLayoutId);
 		
 		this.kpRecyclerViewPicture = (RecyclerView) findViewById(R.id.kpRecyclerViewPicture);
 		this.kpRecyclerViewPicture.setLayoutManager(new GridLayoutManager(this, 3));
@@ -124,6 +127,10 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	}
 	
 	private void toggleAlbumAndLayer() {
+		if ((this.layerShowAnimation.hasStarted() && !this.layerShowAnimation.hasEnded())
+				|| (this.layerHideAnimation.hasStarted() && !this.layerHideAnimation.hasEnded())) {
+			return;
+		}
 		if (this.kpAlbumLayer.getVisibility() == View.VISIBLE) {
 			this.kpAlbumLayer.startAnimation(this.layerHideAnimation);
 			this.kpRecyclerViewAlbum.startAnimation(this.albumHideAnimation);
@@ -294,7 +301,9 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		this.kpRecyclerViewAlbum.getItemAnimator().setRemoveDuration(0);
 		
 		this.albumListAdapter = new AlbumListAdapter(
-				this, this.kpPicker,
+				this,
+				this.kpPicker.albumListLayoutId,
+				this.kpPicker,
 				new AlbumListAdapter.OnAlbumListener() {
 					@Override
 					public void onAlbum(AlbumInfo albumInfo) {
@@ -323,6 +332,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		
 		this.pictureListAdapter = new PictureListAdapter(
 				this,
+				this.kpPicker.cameraListLayoutId, this.kpPicker.pictureListLayoutId,
 				this.kpPicker.pickCount == 1, albumInfo,
 				new PictureListAdapter.OnPictureListener() {
 					@Override
@@ -603,8 +613,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	 */
 	private boolean requestStoragePermission() {
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-				|| ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-				) {
+				|| ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 				ActivityCompat.requestPermissions(
 						this,

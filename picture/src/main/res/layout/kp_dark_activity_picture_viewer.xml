@@ -16,7 +16,7 @@
 		android:id="@id/kpToolbar"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:background="@color/kpActionBarColor">
+		android:background="#323232">
 		
 		<ImageView
 			android:id="@id/kpBack"
@@ -24,7 +24,7 @@
 			android:layout_height="@dimen/kpActionBarSize"
 			android:background="?android:attr/selectableItemBackground"
 			android:scaleType="centerInside"
-			android:src="@drawable/kp_ic_back_dark"/>
+			android:src="@drawable/kp_dark_ic_back"/>
 		
 		<TextView
 			android:id="@id/kpTitle"
@@ -33,8 +33,8 @@
 			android:layout_weight="1.0"
 			android:gravity="center_vertical"
 			android:text="@string/kp_view"
-			android:textColor="@android:color/white"
-			android:textSize="18sp"/>
+			android:textColor="@color/kp_dark_tv_alter"
+			android:textSize="16sp"/>
 		
 		<ImageView
 			android:id="@id/kpEdit"
@@ -42,6 +42,6 @@
 			android:layout_height="@dimen/kpActionBarSize"
 			android:background="?android:attr/selectableItemBackground"
 			android:scaleType="centerInside"
-			android:src="@drawable/kp_ic_remove_dark"/>
+			android:src="@drawable/kp_dark_ic_remove"/>
 	</LinearLayout>
 </RelativeLayout>

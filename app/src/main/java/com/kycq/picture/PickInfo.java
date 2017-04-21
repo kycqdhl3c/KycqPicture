@@ -3,7 +3,11 @@ package com.kycq.picture;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.kycq.library.picture.picker.KPPicker;
+
 class PickInfo implements Parcelable {
+	int pickStyle = KPPicker.DARK;
+	
 	int aspectX;
 	int aspectY;
 	int scaleWidth;
@@ -15,6 +19,7 @@ class PickInfo implements Parcelable {
 	}
 	
 	private PickInfo(Parcel in) {
+		pickStyle = in.readInt();
 		aspectX = in.readInt();
 		aspectY = in.readInt();
 		scaleWidth = in.readInt();
@@ -25,6 +30,7 @@ class PickInfo implements Parcelable {
 	
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(pickStyle);
 		dest.writeInt(aspectX);
 		dest.writeInt(aspectY);
 		dest.writeInt(scaleWidth);

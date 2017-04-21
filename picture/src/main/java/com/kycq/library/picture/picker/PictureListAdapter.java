@@ -22,16 +22,22 @@ class PictureListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	
 	private LayoutInflater inflater;
 	
+	private int cameraListLayoutId;
+	private int pictureListLayoutId;
+	
 	private boolean isSingle;
 	private AlbumInfo albumInfo;
 	
 	private OnPictureListener onPictureListener;
 	
 	PictureListAdapter(Context context,
+	                   int cameraListLayoutId, int pictureListLayoutId,
 	                   boolean isSingle,
 	                   AlbumInfo albumInfo,
 	                   OnPictureListener onPictureListener) {
 		this.inflater = LayoutInflater.from(context);
+		this.cameraListLayoutId = cameraListLayoutId;
+		this.pictureListLayoutId = pictureListLayoutId;
 		this.isSingle = isSingle;
 		this.albumInfo = albumInfo;
 		this.onPictureListener = onPictureListener;
@@ -116,9 +122,9 @@ class PictureListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		if (viewType == CAMERA) {
-			return new CameraHolder(this.inflater.inflate(R.layout.kp_item_camera_list_dark, parent, false));
+			return new CameraHolder(this.inflater.inflate(this.cameraListLayoutId, parent, false));
 		}
-		return new PictureHolder(this.inflater.inflate(R.layout.kp_item_picture_list_dark, parent, false));
+		return new PictureHolder(this.inflater.inflate(this.pictureListLayoutId, parent, false));
 	}
 	
 	@Override
