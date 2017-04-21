@@ -106,7 +106,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 			window.setStatusBarColor(ActivityCompat.getColor(this, R.color.kpStatusBarColor));
 		}
 		
-		setContentView(R.layout.kp_activity_picture_picker);
+		setContentView(R.layout.kp_activity_picture_picker_dark);
 		
 		this.kpRecyclerViewPicture = (RecyclerView) findViewById(R.id.kpRecyclerViewPicture);
 		this.kpRecyclerViewPicture.setLayoutManager(new GridLayoutManager(this, 3));

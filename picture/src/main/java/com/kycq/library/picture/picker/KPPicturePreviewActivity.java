@@ -86,7 +86,7 @@ public class KPPicturePreviewActivity extends AppCompatActivity {
 			window.setStatusBarColor(ActivityCompat.getColor(this, R.color.kpStatusBarColor));
 		}
 		
-		setContentView(R.layout.kp_activity_picture_preview);
+		setContentView(R.layout.kp_activity_picture_preview_dark);
 		
 		this.kpViewPager = (ViewPager) findViewById(R.id.kpViewPager);
 	}

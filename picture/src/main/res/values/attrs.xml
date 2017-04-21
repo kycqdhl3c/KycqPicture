@@ -13,4 +13,34 @@
 		<attr name="picture_insertBackground" format="reference"/>
 		<attr name="picture_pictureViewLayout" format="reference"/>
 	</declare-styleable>
+	
+	<declare-styleable name="GenericDraweeHierarchy">
+		<attr name="viewAspectRatio" format="float"/>
+		<attr name="placeholderImage" format="reference"/>
+		<attr name="placeholderImageScaleType">
+			<enum name="none" value="-1"/>
+			<enum name="fitXY" value="0"/>
+			<enum name="fitStart" value="1"/>
+			<enum name="fitCenter" value="2"/>
+			<enum name="fitEnd" value="3"/>
+			<enum name="center" value="4"/>
+			<enum name="centerInside" value="5"/>
+			<enum name="centerCrop" value="6"/>
+			<enum name="focusCrop" value="7"/>
+		</attr>
+		<attr name="failureImage" format="reference"/>
+		<attr name="failureImageScaleType">
+			<enum name="none" value="-1"/>
+			<enum name="fitXY" value="0"/>
+			<enum name="fitStart" value="1"/>
+			<enum name="fitCenter" value="2"/>
+			<enum name="fitEnd" value="3"/>
+			<enum name="center" value="4"/>
+			<enum name="centerInside" value="5"/>
+			<enum name="centerCrop" value="6"/>
+			<enum name="focusCrop" value="7"/>
+		</attr>
+		<attr name="backgroundImage" format="reference"/>
+		<attr name="overlayImage" format="reference"/>
+	</declare-styleable>
 </resources>

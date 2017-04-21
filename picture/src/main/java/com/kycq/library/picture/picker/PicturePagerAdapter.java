@@ -63,17 +63,17 @@ class PicturePagerAdapter extends PagerAdapter {
 	
 	@Override
 	public View instantiateItem(ViewGroup container, int position) {
-		View convertView = this.inflater.inflate(R.layout.kp_item_picture_pager, container, false);
+		View convertView = this.inflater.inflate(R.layout.kp_item_picture_pager_dark, container, false);
 		ZoomableDraweeView pictureView = (ZoomableDraweeView) convertView.findViewById(R.id.kpPictureView);
 		// 图片控件配置
 		pictureView.getHierarchy()
 				.setPlaceholderImage(
-						R.drawable.kp_ic_picture_loading,
+						R.drawable.kp_ic_picture_loading_dark,
 						ScalingUtils.ScaleType.CENTER
 				);
 		pictureView.getHierarchy()
 				.setFailureImage(
-						R.drawable.kp_ic_picture_error,
+						R.drawable.kp_ic_picture_error_dark,
 						ScalingUtils.ScaleType.CENTER
 				);
 		pictureView.setTapListener(new GestureDetector.SimpleOnGestureListener() {

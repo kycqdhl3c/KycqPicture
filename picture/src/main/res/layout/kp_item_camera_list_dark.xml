@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
@@ -10,20 +11,10 @@
 		android:id="@id/kpPictureView"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_gravity="center"/>
-	
-	<View
-		android:id="@id/kpLayer"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:background="@drawable/kp_bg_picture_layer"/>
-	
-	<ImageView
-		android:id="@id/kpSelected"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="end"
-		android:padding="5dp"
-		android:src="@drawable/kp_ic_picture_check"/>
+		android:layout_gravity="center"
+		android:background="@android:color/black"
+		app:placeholderImage="@drawable/kp_ic_camera_dark"
+		app:placeholderImageScaleType="centerInside"
+		app:viewAspectRatio="1.0"/>
 
 </FrameLayout>

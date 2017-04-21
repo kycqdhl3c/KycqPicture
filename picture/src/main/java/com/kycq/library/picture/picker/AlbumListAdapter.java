@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
@@ -84,7 +83,7 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 	
 	@Override
 	public AlbumHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		return new AlbumHolder(this.inflater.inflate(R.layout.kp_item_album_list, parent, false));
+		return new AlbumHolder(this.inflater.inflate(R.layout.kp_item_album_list_dark, parent, false));
 	}
 	
 	@Override
@@ -114,19 +113,6 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 		 * @param albumInfo 相册信息
 		 */
 		void setAlbumInfo(AlbumInfo albumInfo) {
-			// 设置图片展示控件属性
-			this.kpPictureView.setAspectRatio(1.0f);
-			this.kpPictureView.getHierarchy()
-					.setPlaceholderImage(
-							R.drawable.kp_ic_picture_loading,
-							ScalingUtils.ScaleType.FIT_XY
-					);
-			this.kpPictureView.getHierarchy()
-					.setFailureImage(
-							R.drawable.kp_ic_picture_error,
-							ScalingUtils.ScaleType.FIT_XY
-					);
-			
 			this.kpTitle.setText(albumInfo.albumName);
 			this.kpContent.setText(inflater.getContext().getString(
 					R.string.kp_format_pieces_of_picture, albumInfo.pictureInfoList.size()));

@@ -9,13 +9,17 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.kycq.library.picture.R;
 
-class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.PictureHolder> {
+class PictureListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+	/** 拍照 */
+	private static final int CAMERA = 0;
+	/** 图片 */
+	private static final int PICTURE = 1;
+	
 	private LayoutInflater inflater;
 	
 	private boolean isSingle;
@@ -63,16 +67,19 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 	}
 	
 	/**
+	 * 拍照
+	 */
+	private void pickCamera() {
+		onPictureListener.onCamera();
+	}
+	
+	/**
 	 * 预览图片
 	 *
 	 * @param adapterPosition 图片列表位置
 	 */
 	private void pickPreview(int adapterPosition) {
 		if (this.albumInfo.isFullAlbum()) {
-			if (adapterPosition == 0) {
-				onPictureListener.onCamera();
-				return;
-			}
 			adapterPosition--;
 		}
 		if (isSingle) {
@@ -99,20 +106,31 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 	}
 	
 	@Override
-	public PictureHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-		return new PictureHolder(this.inflater.inflate(R.layout.kp_item_picture_list, parent, false));
+	public int getItemViewType(int position) {
+		if (this.albumInfo.isFullAlbum() && position == 0) {
+			return CAMERA;
+		}
+		return PICTURE;
 	}
 	
 	@Override
-	public void onBindViewHolder(PictureHolder holder, int position) {
-		if (this.albumInfo.isFullAlbum() && position == 0) {
-			holder.setCameraInfo();
-		} else {
-			holder.setPictureInfo(getItem(position));
+	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		if (viewType == CAMERA) {
+			return new CameraHolder(this.inflater.inflate(R.layout.kp_item_camera_list_dark, parent, false));
+		}
+		return new PictureHolder(this.inflater.inflate(R.layout.kp_item_picture_list_dark, parent, false));
+	}
+	
+	@Override
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+		int viewType = holder.getItemViewType();
+		if (viewType == PICTURE) {
+			PictureHolder pictureHolder = (PictureHolder) holder;
+			pictureHolder.setPictureInfo(getItem(position));
 		}
 	}
 	
-	class PictureHolder extends RecyclerView.ViewHolder {
+	private class PictureHolder extends RecyclerView.ViewHolder {
 		private SimpleDraweeView kpPictureView;
 		private View kpLayer;
 		private ImageView kpSelected;
@@ -137,34 +155,7 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 			});
 		}
 		
-		void setCameraInfo() {
-			this.itemView.setBackgroundColor(0xFF000000);
-			this.kpPictureView.setAspectRatio(1.0f);
-			this.kpPictureView.getHierarchy()
-					.setPlaceholderImage(
-							R.drawable.kp_ic_camera,
-							ScalingUtils.ScaleType.CENTER_INSIDE
-					);
-			this.kpPictureView.setController(null);
-			
-			this.kpLayer.setVisibility(View.GONE);
-			this.kpSelected.setVisibility(View.GONE);
-		}
-		
 		void setPictureInfo(PictureInfo pictureInfo) {
-			this.itemView.setBackgroundColor(0x00000000);
-			this.kpPictureView.setAspectRatio(1.0f);
-			this.kpPictureView.getHierarchy()
-					.setPlaceholderImage(
-							R.drawable.kp_ic_picture_loading,
-							ScalingUtils.ScaleType.FIT_XY
-					);
-			this.kpPictureView.getHierarchy()
-					.setFailureImage(
-							R.drawable.kp_ic_picture_error,
-							ScalingUtils.ScaleType.FIT_XY
-					);
-			
 			this.kpLayer.setVisibility(View.VISIBLE);
 			this.kpLayer.setSelected(pictureInfo.selected);
 			this.kpSelected.setVisibility(isSingle ? View.GONE : View.VISIBLE);
@@ -181,6 +172,20 @@ class PictureListAdapter extends RecyclerView.Adapter<PictureListAdapter.Picture
 							)
 							.build()
 			);
+		}
+	}
+	
+	private class CameraHolder extends RecyclerView.ViewHolder {
+		
+		CameraHolder(View itemView) {
+			super(itemView);
+			
+			itemView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					pickCamera();
+				}
+			});
 		}
 	}
 	

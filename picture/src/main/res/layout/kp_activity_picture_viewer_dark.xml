@@ -24,7 +24,7 @@
 			android:layout_height="@dimen/kpActionBarSize"
 			android:background="?android:attr/selectableItemBackground"
 			android:scaleType="centerInside"
-			android:src="@drawable/kp_ic_back"/>
+			android:src="@drawable/kp_ic_back_dark"/>
 		
 		<TextView
 			android:id="@id/kpTitle"
@@ -42,6 +42,6 @@
 			android:layout_height="@dimen/kpActionBarSize"
 			android:background="?android:attr/selectableItemBackground"
 			android:scaleType="centerInside"
-			android:src="@drawable/kp_ic_remove"/>
+			android:src="@drawable/kp_ic_remove_dark"/>
 	</LinearLayout>
 </RelativeLayout>
