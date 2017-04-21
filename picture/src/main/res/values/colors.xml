@@ -2,6 +2,4 @@
 <resources>
 	<color name="kpStatusBarColor">#222222</color>
 	<color name="kpActionBarColor">#323232</color>
-	<color name="kpBackgroundColor">#202020</color>
-	<color name="kpLayerColor">#99000000</color>
 </resources>

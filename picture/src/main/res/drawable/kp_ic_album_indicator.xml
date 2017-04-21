@@ -1,9 +1,9 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-        android:width="10dp"
-        android:height="10dp"
-        android:viewportHeight="100"
-        android:viewportWidth="100">
-	<path
-		android:fillColor="#FF999999"
-		android:pathData="M100,0l0,100l-100,0l100,-100z"/>
-</vector>
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:drawable="@drawable/kp_ic_album_indicator_enabled"
+		android:state_enabled="true"/>
+	<item
+		android:drawable="@drawable/kp_ic_album_indicator_disabled"
+		android:state_enabled="false"/>
+</selector>

@@ -25,7 +25,7 @@
 			android:id="@id/kpTitle"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:textColor="#333333"
+			android:textColor="@color/kp_tv_alter"
 			android:textSize="16sp"/>
 		
 		<TextView
@@ -33,7 +33,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="5dp"
-			android:textColor="#999999"
+			android:textColor="#CCCCCC"
 			android:textSize="14sp"/>
 	</LinearLayout>
 	
