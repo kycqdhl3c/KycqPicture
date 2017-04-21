@@ -7,18 +7,61 @@
 	android:background="#202020"
 	tools:context=".picker.KPPicturePickerActivity">
 	
+	<LinearLayout
+		android:id="@id/kpToolbar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="@color/kpActionBarColor"
+		android:gravity="center_vertical">
+		
+		<ImageView
+			android:id="@id/kpBack"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="?android:attr/selectableItemBackground"
+			android:padding="10dp"
+			android:scaleType="centerInside"
+			android:src="@drawable/kp_ic_back"/>
+		
+		<TextView
+			android:id="@id/kpTitle"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0"
+			android:gravity="center_vertical"
+			android:text="@string/kp_select_picture"
+			android:textColor="@android:color/white"
+			android:textSize="16sp"/>
+		
+		<TextView
+			android:id="@+id/kpDone"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginEnd="10dp"
+			android:layout_marginLeft="10dp"
+			android:layout_marginRight="10dp"
+			android:layout_marginStart="10dp"
+			android:background="@drawable/kp_bg_done"
+			android:gravity="center"
+			android:padding="6dp"
+			android:text="@string/kp_format_selected"
+			android:textColor="@android:color/white"
+			android:textSize="12sp"/>
+	</LinearLayout>
+	
 	<android.support.v7.widget.RecyclerView
 		android:id="@id/kpRecyclerViewPicture"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_above="@id/kpActionbar"
-		android:paddingTop="@dimen/kpActionBarSize"/>
+		android:layout_below="@id/kpToolbar"/>
 	
 	<FrameLayout
 		android:id="@id/kpAlbumLayer"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_above="@id/kpActionbar"
+		android:layout_below="@id/kpToolbar"
 		android:background="#99000000"
 		android:visibility="gone"/>
 	

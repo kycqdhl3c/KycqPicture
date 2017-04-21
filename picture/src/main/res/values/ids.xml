@@ -10,6 +10,7 @@
 	<item name="kpAlbumLayer" type="id"/>
 	<item name="kpRecyclerViewAlbum" type="id"/>
 	
+	<item name="kpToolbar" type="id"/>
 	<item name="kpActionbar" type="id"/>
 	<item name="kpAlbum" type="id"/>
 	<item name="kpAlbumName" type="id"/>

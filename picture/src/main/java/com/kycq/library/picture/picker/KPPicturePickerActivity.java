@@ -1,7 +1,6 @@
 package com.kycq.library.picture.picker;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,15 +15,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.kycq.library.picture.R;
@@ -113,6 +109,8 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		setContentView(R.layout.kp_activity_picture_picker);
 		
 		this.kpRecyclerViewPicture = (RecyclerView) findViewById(R.id.kpRecyclerViewPicture);
+		this.kpRecyclerViewPicture.setLayoutManager(new GridLayoutManager(this, 3));
+		this.kpRecyclerViewPicture.addItemDecoration(new PictureItemDecoration(this));
 		
 		this.kpAlbumLayer = findViewById(R.id.kpAlbumLayer);
 		this.kpAlbumLayer.setOnClickListener(new View.OnClickListener() {
@@ -122,6 +120,40 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 			}
 		});
 		this.kpRecyclerViewAlbum = (RecyclerView) findViewById(R.id.kpRecyclerViewAlbum);
+		this.kpRecyclerViewAlbum.setLayoutManager(new LinearLayoutManager(this));
+	}
+	
+	private void toggleAlbumAndLayer() {
+		if (this.kpAlbumLayer.getVisibility() == View.VISIBLE) {
+			this.kpAlbumLayer.startAnimation(this.layerHideAnimation);
+			this.kpRecyclerViewAlbum.startAnimation(this.albumHideAnimation);
+		} else {
+			this.kpAlbumLayer.startAnimation(this.layerShowAnimation);
+			this.kpAlbumLayer.setVisibility(View.VISIBLE);
+			this.kpRecyclerViewAlbum.startAnimation(this.albumShowAnimation);
+			this.kpRecyclerViewAlbum.setVisibility(View.VISIBLE);
+		}
+	}
+	
+	private void observeToolbar() {
+		if (getSupportActionBar() != null) {
+			getSupportActionBar().hide();
+		}
+		
+		View kpBack = findViewById(R.id.kpBack);
+		kpBack.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onBackPressed();
+			}
+		});
+		this.kpDone = (TextView) findViewById(R.id.kpDone);
+		this.kpDone.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				requestCompress();
+			}
+		});
 		
 		this.kpActionbar = findViewById(R.id.kpActionbar);
 		this.kpAlbum = findViewById(R.id.kpAlbum);
@@ -186,61 +218,6 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 			
 			@Override
 			public void onAnimationRepeat(Animation animation) {
-			}
-		});
-	}
-	
-	private void toggleAlbumAndLayer() {
-		if (this.kpAlbumLayer.getVisibility() == View.VISIBLE) {
-			this.kpAlbumLayer.startAnimation(this.layerHideAnimation);
-			this.kpRecyclerViewAlbum.startAnimation(this.albumHideAnimation);
-		} else {
-			this.kpAlbumLayer.startAnimation(this.layerShowAnimation);
-			this.kpAlbumLayer.setVisibility(View.VISIBLE);
-			this.kpRecyclerViewAlbum.startAnimation(this.albumShowAnimation);
-			this.kpRecyclerViewAlbum.setVisibility(View.VISIBLE);
-		}
-	}
-	
-	@SuppressLint("InflateParams")
-	private void observeToolbar() {
-		View customView;
-		if (getSupportActionBar() == null) {
-			customView = getLayoutInflater().inflate(R.layout.kp_picture_picker_toolbar, null);
-			addContentView(
-					customView,
-					new ViewGroup.MarginLayoutParams(
-							ViewGroup.LayoutParams.MATCH_PARENT,
-							getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)
-					)
-			);
-		} else {
-			getSupportActionBar().setDisplayShowHomeEnabled(false);
-			getSupportActionBar().setDisplayShowTitleEnabled(false);
-			getSupportActionBar().setDisplayShowCustomEnabled(true);
-			getSupportActionBar().setCustomView(R.layout.kp_picture_picker_toolbar);
-			customView = getSupportActionBar().getCustomView();
-			Toolbar toolbar = (Toolbar) customView.getParent();
-			toolbar.setContentInsetsAbsolute(0, 0);
-			toolbar.setLayoutParams(
-					new FrameLayout.LayoutParams(
-							FrameLayout.LayoutParams.MATCH_PARENT,
-							getResources().getDimensionPixelSize(R.dimen.kpActionBarSize)
-					));
-		}
-		
-		View kpBack = customView.findViewById(R.id.kpBack);
-		kpBack.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onBackPressed();
-			}
-		});
-		this.kpDone = (TextView) customView.findViewById(R.id.kpDone);
-		this.kpDone.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				requestCompress();
 			}
 		});
 	}
@@ -311,7 +288,6 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	}
 	
 	private void observeAlbumList() {
-		this.kpRecyclerViewAlbum.setLayoutManager(new LinearLayoutManager(this));
 		this.kpRecyclerViewAlbum.getItemAnimator().setChangeDuration(0);
 		this.kpRecyclerViewAlbum.getItemAnimator().setAddDuration(0);
 		this.kpRecyclerViewAlbum.getItemAnimator().setMoveDuration(0);
@@ -340,7 +316,6 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	}
 	
 	private void observePictureList(AlbumInfo albumInfo) {
-		this.kpRecyclerViewPicture.setLayoutManager(new GridLayoutManager(this, 3));
 		this.kpRecyclerViewPicture.getItemAnimator().setChangeDuration(0);
 		this.kpRecyclerViewPicture.getItemAnimator().setAddDuration(0);
 		this.kpRecyclerViewPicture.getItemAnimator().setMoveDuration(0);
