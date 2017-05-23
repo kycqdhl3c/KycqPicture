@@ -28,6 +28,8 @@ import com.kycq.library.picture.widget.LoadingDialog;
 
 import java.util.ArrayList;
 
+import static android.os.Build.VERSION_CODES.M;
+
 public class KPPicturePickerActivity extends AppCompatActivity {
 	/** 权限 */
 	private static final int PERMISSION = 1;
@@ -100,7 +102,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	
 	private void observeViews() {
 		getDelegate().requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		if (Build.VERSION.SDK_INT >= M) {
 			Window window = getWindow();
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 			window.setStatusBarColor(this.kpPicker.statusBarColor);
@@ -613,13 +615,15 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	 */
 	private boolean requestStoragePermission() {
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-				|| ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+				|| ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+				|| ActivityCompat.checkSelfPermission(this,Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 				ActivityCompat.requestPermissions(
 						this,
 						new String[]{
 								Manifest.permission.READ_EXTERNAL_STORAGE,
-								Manifest.permission.WRITE_EXTERNAL_STORAGE
+								Manifest.permission.WRITE_EXTERNAL_STORAGE,
+								Manifest.permission.CAMERA
 						},
 						PERMISSION
 				);
@@ -627,7 +631,8 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 				ActivityCompat.requestPermissions(
 						this,
 						new String[]{
-								Manifest.permission.WRITE_EXTERNAL_STORAGE
+								Manifest.permission.WRITE_EXTERNAL_STORAGE,
+								Manifest.permission.CAMERA
 						},
 						PERMISSION
 				);
