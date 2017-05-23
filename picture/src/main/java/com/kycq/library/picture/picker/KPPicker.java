@@ -40,6 +40,7 @@ public class KPPicker implements Parcelable {
 	int pickerLayoutId = R.layout.kp_light_activity_picture_picker;
 	int cameraListLayoutId = R.layout.kp_light_item_camera_list;
 	int pictureListLayoutId = R.layout.kp_light_item_picture_list;
+	int albumAllListLayoutId = R.layout.kp_light_item_album_all_list;
 	int albumListLayoutId = R.layout.kp_light_item_album_list;
 	int previewLayoutId = R.layout.kp_light_activity_picture_preview;
 	
@@ -70,6 +71,7 @@ public class KPPicker implements Parcelable {
 		pickerLayoutId = in.readInt();
 		cameraListLayoutId = in.readInt();
 		pictureListLayoutId = in.readInt();
+		albumAllListLayoutId = in.readInt();
 		albumListLayoutId = in.readInt();
 		previewLayoutId = in.readInt();
 		
@@ -95,6 +97,7 @@ public class KPPicker implements Parcelable {
 		dest.writeInt(pickerLayoutId);
 		dest.writeInt(cameraListLayoutId);
 		dest.writeInt(pictureListLayoutId);
+		dest.writeInt(albumAllListLayoutId);
 		dest.writeInt(albumListLayoutId);
 		dest.writeInt(previewLayoutId);
 		
@@ -297,6 +300,7 @@ public class KPPicker implements Parcelable {
 				kpPicker.pickerLayoutId = R.layout.kp_dark_activity_picture_picker;
 				kpPicker.cameraListLayoutId = R.layout.kp_dark_item_camera_list;
 				kpPicker.pictureListLayoutId = R.layout.kp_dark_item_picture_list;
+				kpPicker.albumAllListLayoutId = R.layout.kp_dark_item_album_all_list;
 				kpPicker.albumListLayoutId = R.layout.kp_dark_item_album_list;
 				kpPicker.previewLayoutId = R.layout.kp_dark_activity_picture_preview;
 			} else if (this.pickStyle == LIGHT) {
@@ -305,6 +309,7 @@ public class KPPicker implements Parcelable {
 				kpPicker.pickerLayoutId = R.layout.kp_light_activity_picture_picker;
 				kpPicker.cameraListLayoutId = R.layout.kp_light_item_camera_list;
 				kpPicker.pictureListLayoutId = R.layout.kp_light_item_picture_list;
+				kpPicker.albumAllListLayoutId = R.layout.kp_light_item_album_all_list;
 				kpPicker.albumListLayoutId = R.layout.kp_light_item_album_list;
 				kpPicker.previewLayoutId = R.layout.kp_light_activity_picture_preview;
 			}

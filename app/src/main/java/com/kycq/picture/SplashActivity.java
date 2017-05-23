@@ -91,7 +91,7 @@ public class SplashActivity extends AppCompatActivity {
 						.pickCompressQuality(pickInfo.compressQuality)
 						.pick(SplashActivity.this, PICKER);
 			}
-			
+
 			@Override
 			public void onEdit(int position, Uri pictureUri) {
 				mDataBinding.pictureLayout.removePictureUri(position);
@@ -101,7 +101,7 @@ public class SplashActivity extends AppCompatActivity {
 						viewClickListener));
 				mDataBinding.viewPager.setCurrentItem(mDataBinding.pictureLayout.getSelectedPosition());
 			}
-			
+
 			@Override
 			public void onSelect(int position, Uri pictureUri) {
 				mDataBinding.viewPager.setCurrentItem(position);

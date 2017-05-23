@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="?android:attr/selectableItemBackground"
+              android:gravity="center_vertical"
+              android:paddingBottom="5dp"
+              android:paddingLeft="10dp"
+              android:paddingRight="10dp"
+              android:paddingTop="5dp">
+	
+	<com.facebook.drawee.view.SimpleDraweeView
+		android:id="@id/kpPictureView"
+		android:layout_width="60dp"
+		android:layout_height="60dp"
+		app:failureImage="@drawable/kp_light_ic_picture_error"
+		app:failureImageScaleType="fitXY"
+		app:placeholderImage="@drawable/kp_dark_ic_album_all"
+		app:placeholderImageScaleType="fitXY"/>
+	
+	<TextView
+		android:id="@id/kpTitle"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_margin="10dp"
+		android:layout_weight="1.0"
+		android:textColor="@color/kp_dark_tv_alter"
+		android:textSize="16sp"
+		tools:text="@string/kp_all_picture"/>
+	
+	<ImageView
+		android:id="@id/kpSelected"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/kp_dark_ic_album_check"/>
+</LinearLayout>

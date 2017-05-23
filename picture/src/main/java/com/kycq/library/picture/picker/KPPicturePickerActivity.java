@@ -271,6 +271,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 						kpActionbar.setVisibility(View.VISIBLE);
 						boolean enabled = !(kpPicker.fullAlbumInfo.pictureInfoList.isEmpty()
 								&& kpPicker.albumInfoList.isEmpty());
+						enabled |= !kpPicker.cacheAlbumInfo.pictureInfoList.isEmpty();
 						kpAlbum.setEnabled(enabled);
 						kpAlbumName.setEnabled(enabled);
 						observeAlbumList();
@@ -304,7 +305,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		
 		this.albumListAdapter = new AlbumListAdapter(
 				this,
-				this.kpPicker.albumListLayoutId,
+				this.kpPicker.albumAllListLayoutId, this.kpPicker.albumListLayoutId,
 				this.kpPicker,
 				new AlbumListAdapter.OnAlbumListener() {
 					@Override
@@ -616,7 +617,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 	private boolean requestStoragePermission() {
 		if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
 				|| ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-				|| ActivityCompat.checkSelfPermission(this,Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+				|| ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 				ActivityCompat.requestPermissions(
 						this,

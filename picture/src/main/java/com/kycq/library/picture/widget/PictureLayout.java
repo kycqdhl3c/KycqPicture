@@ -59,6 +59,14 @@ public class PictureLayout extends ViewGroup {
 	/** 图片地址列表 */
 	private ArrayList<Uri> pictureList = new ArrayList<>();
 	
+	private OnClickListener selectClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			int position = (int) v.getTag();
+			onPictureListener.onSelect(position, pictureList.get(position));
+		}
+	};
+	
 	/**
 	 * 构造方法
 	 *
@@ -254,6 +262,11 @@ public class PictureLayout extends ViewGroup {
 	 */
 	public void setOnPictureListener(OnPictureListener listener) {
 		this.onPictureListener = listener;
+		int childCount = getChildCount();
+		for (int index = 0; index < childCount; index++) {
+			View view = getChildAt(index);
+			view.setClickable(this.onPictureListener != null);
+		}
 	}
 	
 	/**
@@ -564,7 +577,7 @@ public class PictureLayout extends ViewGroup {
 	 * @param view     图片控件
 	 * @param position 图片列表位置
 	 */
-	private void bindPictureView(View view, final int position) {
+	private void bindPictureView(View view, int position) {
 		SimpleDraweeView pictureView = (SimpleDraweeView) view;
 		pictureView.getHierarchy().setRoundingParams(new RoundingParams().setCornersRadius(this.pictureRound));
 		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
@@ -572,14 +585,9 @@ public class PictureLayout extends ViewGroup {
 		);
 		setLayoutParamsMargin(layoutParams);
 		pictureView.setLayoutParams(layoutParams);
-		pictureView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (onPictureListener != null) {
-					onPictureListener.onSelect(position, pictureList.get(position));
-				}
-			}
-		});
+		pictureView.setTag(position);
+		view.setOnClickListener(this.selectClickListener);
+		view.setClickable(this.onPictureListener != null);
 	}
 	
 	/**

@@ -15,9 +15,15 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.kycq.library.picture.R;
 
-class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder> {
+class AlbumListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+	/** 所有图片相册 */
+	private static final int ALBUM_ALL = 0;
+	/** 图片相册 */
+	private static final int ALBUM = 1;
+	
 	private LayoutInflater inflater;
 	
+	private int albumAllListLayoutId;
 	private int albumListLayoutId;
 	
 	private KPPicker kpPicker;
@@ -26,10 +32,11 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 	private int selectedPosition = 0;
 	
 	AlbumListAdapter(Context context,
-	                 int albumListLayoutId,
+	                 int albumAllListLayoutId, int albumListLayoutId,
 	                 KPPicker kpPicker,
 	                 OnAlbumListener onAlbumListener) {
 		this.inflater = LayoutInflater.from(context);
+		this.albumAllListLayoutId = albumAllListLayoutId;
 		this.albumListLayoutId = albumListLayoutId;
 		this.kpPicker = kpPicker;
 		this.onAlbumListener = onAlbumListener;
@@ -86,16 +93,34 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 	}
 	
 	@Override
-	public AlbumHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+	public int getItemViewType(int position) {
+		if (position == 0) {
+			return ALBUM_ALL;
+		}
+		return ALBUM;
+	}
+	
+	@Override
+	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		if (viewType == ALBUM_ALL) {
+			return new AlbumAllHolder(this.inflater.inflate(this.albumAllListLayoutId, parent, false));
+		}
 		return new AlbumHolder(this.inflater.inflate(this.albumListLayoutId, parent, false));
 	}
 	
 	@Override
-	public void onBindViewHolder(AlbumHolder holder, int position) {
-		holder.setAlbumInfo(getItem(position));
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+		int viewType = holder.getItemViewType();
+		if (viewType == ALBUM) {
+			AlbumHolder albumHolder = (AlbumHolder) holder;
+			albumHolder.setAlbumInfo(getItem(position));
+		} else if (viewType == ALBUM_ALL) {
+			AlbumAllHolder albumAllHolder = (AlbumAllHolder) holder;
+			albumAllHolder.setAlbumInfo(getItem(position));
+		}
 	}
 	
-	class AlbumHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+	private class AlbumHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 		private SimpleDraweeView kpPictureView;
 		private TextView kpTitle;
 		private TextView kpContent;
@@ -134,6 +159,29 @@ class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.AlbumHolder
 							)
 							.build()
 			);
+		}
+		
+		@Override
+		public void onClick(View v) {
+			setSelectedPosition(getAdapterPosition());
+		}
+	}
+	
+	private class AlbumAllHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+		private TextView kpTitle;
+		private ImageView kpSelected;
+		
+		AlbumAllHolder(View itemView) {
+			super(itemView);
+			
+			itemView.setOnClickListener(this);
+			this.kpTitle = (TextView) itemView.findViewById(R.id.kpTitle);
+			this.kpSelected = (ImageView) itemView.findViewById(R.id.kpSelected);
+		}
+		
+		void setAlbumInfo(AlbumInfo albumInfo) {
+			this.kpTitle.setText(albumInfo.albumName);
+			this.kpSelected.setSelected(selectedPosition == getAdapterPosition());
 		}
 		
 		@Override
