@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.kycq.library.picture.R;
 import com.kycq.library.picture.widget.LoadingDialog;
+import com.yalantis.ucrop.UCrop;
 
 import java.util.ArrayList;
 
@@ -416,10 +417,33 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		}
 	}
 	
+	private void cropPicture() {
+		if (this.kpPicker.pickAspectX > 0 && this.kpPicker.pickAspectY > 0) {
+			PictureInfo cameraPictureInfo = this.kpPicker.pictureInfo;
+			this.kpPicker.pictureInfo = this.kpPicker.createPictureInfo();
+			
+			UCrop uCrop = UCrop.of(cameraPictureInfo.pictureUri, this.kpPicker.pictureInfo.pictureUri);
+			UCrop.Options options = new UCrop.Options();
+			options.setCropGridColumnCount(0);
+			options.setCropGridRowCount(0);
+			options.setHideBottomControls(true);
+			options.setStatusBarColor(this.kpPicker.statusBarColor);
+			options.setToolbarColor(0xFF323232);
+			uCrop.withOptions(options);
+			uCrop.withAspectRatio(this.kpPicker.pickAspectX, this.kpPicker.pickAspectY);
+			if (this.kpPicker.pickMaxWidth > 0 && this.kpPicker.pickMaxHeight > 0) {
+				uCrop.withMaxResultSize(this.kpPicker.pickMaxWidth, this.kpPicker.pickMaxHeight);
+			}
+			uCrop.start(this);
+		} else {
+			cropPictureSystem();
+		}
+	}
+	
 	/**
 	 * 裁剪处理
 	 */
-	private void cropPicture() {
+	private void cropPictureSystem() {
 		PictureInfo cameraPictureInfo = this.kpPicker.pictureInfo;
 		this.kpPicker.pictureInfo = this.kpPicker.createPictureInfo();
 		
@@ -527,6 +551,27 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 			return;
 		}
 		if (requestCode == CROP) {
+			if (this.pictureListAdapter == null) {
+				return;
+			}
+			PictureInfo pictureInfo = this.kpPicker.pictureInfo;
+			this.kpPicker.pictureInfo = null;
+			if (resultCode == RESULT_OK) {
+				pictureInfo.obtainPictureSize();
+				if (pictureInfo.isAvailable()) {
+					this.kpPicker.pictureInfoList.add(pictureInfo);
+					if (this.kpPicker.addPictureInfo(pictureInfo)) {
+						this.albumListAdapter.notifyDataSetChanged();
+						this.pictureListAdapter.notifyPickPicture(pictureInfo);
+						return;
+					}
+				}
+			}
+			pictureInfo.delete();
+			hideLoading();
+			return;
+		}
+		if (requestCode == UCrop.REQUEST_CROP) {
 			if (this.pictureListAdapter == null) {
 				return;
 			}

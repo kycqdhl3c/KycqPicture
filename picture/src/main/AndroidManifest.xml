@@ -25,6 +25,9 @@
 		<activity android:name=".picker.KPPicturePickerActivity"/>
 		<activity android:name=".picker.KPPicturePreviewActivity"/>
 		<activity android:name=".viewer.KPPictureViewerActivity"/>
+		<activity
+			android:name="com.yalantis.ucrop.UCropActivity"
+			android:screenOrientation="portrait"/>
 	</application>
 
 </manifest>

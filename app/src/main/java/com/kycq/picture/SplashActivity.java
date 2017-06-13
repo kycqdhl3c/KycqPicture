@@ -84,7 +84,8 @@ public class SplashActivity extends AppCompatActivity {
 			public void onInsert() {
 				new KPPicker.Builder()
 						.pickStyle(pickInfo.pickStyle)
-						.pickCount(mDataBinding.pictureLayout.getMaxCount() - mDataBinding.pictureLayout.size())
+						.pickCount(1)
+						// .pickCount(mDataBinding.pictureLayout.getMaxCount() - mDataBinding.pictureLayout.size())
 						.pickEditable(pickInfo.isEditable)
 						.pickAspect(pickInfo.aspectX, pickInfo.aspectY)
 						.pickMaxScale(pickInfo.scaleWidth, pickInfo.scaleHeight)
