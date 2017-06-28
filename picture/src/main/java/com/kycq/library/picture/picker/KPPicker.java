@@ -10,9 +10,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
 
 import com.kycq.library.picture.R;
+import com.kycq.library.picture.widget.PictureProvider;
 
 import java.io.File;
 import java.lang.annotation.Retention;
@@ -154,9 +154,8 @@ public class KPPicker implements Parcelable {
 	 */
 	Uri getPictureContentUri(Context context, PictureInfo pictureInfo) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			return FileProvider.getUriForFile(
+			return PictureProvider.getUriForFile(
 					context,
-					context.getPackageName() + ".PictureProvider",
 					new File(pictureInfo.picturePath)
 			);
 		}

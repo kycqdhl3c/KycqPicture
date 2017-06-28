@@ -693,6 +693,7 @@ public class KPPicturePickerActivity extends AppCompatActivity {
 		if (requestCode == PERMISSION) {
 			for (int grant : grantResults) {
 				if (grant == PackageManager.PERMISSION_DENIED) {
+					setResult(RESULT_FIRST_USER);
 					finish();
 					return;
 				}

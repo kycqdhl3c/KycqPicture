@@ -8,7 +8,7 @@ android {
 		minSdkVersion 15
 		targetSdkVersion 25
 		versionCode 1
-		versionName "1.0-dev6"
+		versionName "1.0-dev7"
 		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 	}
 	buildTypes {

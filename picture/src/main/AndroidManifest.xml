@@ -21,6 +21,17 @@
 				android:name="android.support.FILE_PROVIDER_PATHS"
 				android:resource="@xml/kp_picture_paths"/>
 		</provider>
+		<provider
+			android:name=".widget.PictureProvider"
+			android:authorities="${applicationId}.PictureProvider"
+			android:exported="false"
+			android:grantUriPermissions="true"
+			android:readPermission="android.permission.READ_EXTERNAL_STORAGE"
+			android:writePermission="android.permission.WRITE_EXTERNAL_STORAGE">
+			<meta-data
+				android:name="android.support.FILE_PROVIDER_PATHS"
+				android:resource="@xml/kp_picture_paths"/>
+		</provider>
 		
 		<activity android:name=".picker.KPPicturePickerActivity"/>
 		<activity android:name=".picker.KPPicturePreviewActivity"/>
