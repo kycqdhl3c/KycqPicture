@@ -3,6 +3,8 @@ package com.kycq.library.picture.viewer;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -17,17 +19,19 @@ import android.widget.TextView;
 
 import com.kycq.library.picture.R;
 
-public class KPPictureViewerActivity extends AppCompatActivity {
+public class KPPictureViewerActivity extends AppCompatActivity implements Handler.Callback {
 	/** 查看参数信息 */
 	private KPViewer kpViewer;
 	
 	private View toolbarView;
-	private TextView kpTitle;
 	private ViewPager kpViewPager;
+	private TextView kpViewCount;
 	
 	private boolean isFullScreen;
 	
 	private PicturePagerAdapter picturePagerAdapter;
+	
+	private Handler handler = new Handler(this);
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +80,7 @@ public class KPPictureViewerActivity extends AppCompatActivity {
 				onBackPressed();
 			}
 		});
-		this.kpTitle = (TextView) findViewById(R.id.kpTitle);
+		this.kpViewCount = (TextView) findViewById(R.id.kpViewCount);
 		
 		View kpEdit = findViewById(R.id.kpEdit);
 		kpEdit.setOnClickListener(new View.OnClickListener() {
@@ -145,6 +149,15 @@ public class KPPictureViewerActivity extends AppCompatActivity {
 			public void onPageSelected(int position) {
 				KPPictureViewerActivity.this.onPageSelected(position);
 			}
+			
+			@Override
+			public void onPageScrollStateChanged(int state) {
+				kpViewCount.setVisibility(View.VISIBLE);
+				handler.removeMessages(0);
+				if (state == ViewPager.SCROLL_STATE_IDLE) {
+					handler.sendEmptyMessageDelayed(0, 2000);
+				}
+			}
 		});
 		this.kpViewPager.setAdapter(this.picturePagerAdapter);
 		this.kpViewPager.setCurrentItem(this.kpViewer.position, false);
@@ -152,14 +165,11 @@ public class KPPictureViewerActivity extends AppCompatActivity {
 	}
 	
 	private void onPageSelected(int position) {
-		if (kpViewer.pictureList.size() == 1) {
-			kpTitle.setText(R.string.kp_view);
-		} else {
-			kpTitle.setText(
-					getString(R.string.kp_format_view,
-							position + 1, picturePagerAdapter.getCount())
-			);
-		}
+		this.kpViewCount.setText(
+				getString(R.string.kp_format_view,
+						position + 1, picturePagerAdapter.getCount())
+		);
+		this.handler.sendEmptyMessageDelayed(0, 2000);
 	}
 	
 	/**
@@ -212,5 +222,11 @@ public class KPPictureViewerActivity extends AppCompatActivity {
 			}
 		});
 		this.toolbarView.startAnimation(animation);
+	}
+	
+	@Override
+	public boolean handleMessage(Message msg) {
+		this.kpViewCount.setVisibility(View.GONE);
+		return true;
 	}
 }

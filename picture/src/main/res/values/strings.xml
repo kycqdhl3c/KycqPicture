@@ -10,6 +10,6 @@
 	<string name="kp_format_selected">选择(%1$d/%2$d)</string>
 	<string name="kp_edit">编辑</string>
 	<string name="kp_view">查看</string>
-	<string name="kp_format_view">查看(%1$d/%2$d)</string>
+	<string name="kp_format_view">%1$d/%2$d</string>
 	<string name="kp_cache_name">编辑</string>
 </resources>
